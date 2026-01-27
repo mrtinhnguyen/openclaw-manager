@@ -44,6 +44,10 @@ curl -fsSL https://clawdbot-manager.pages.dev/install.sh | MANAGER_REPO_URL=<git
 
 执行结果：全部通过。
 
+- Docker 验证（本地）：  
+  - `docker run --rm -v /tmp/clawdbot-manager-src:/src -e MANAGER_REPO_URL=/src -e MANAGER_ADMIN_USER=admin -e MANAGER_ADMIN_PASS=pass -e MANAGER_API_HOST=127.0.0.1 -e MANAGER_API_PORT=17321 node:22-bullseye bash -lc "apt-get update && apt-get install -y --no-install-recommends git curl ca-certificates && curl -fsSL https://clawdbot-manager.pages.dev/install.sh | MANAGER_REPO_URL=/src MANAGER_ADMIN_USER=admin MANAGER_ADMIN_PASS=pass MANAGER_API_HOST=127.0.0.1 MANAGER_API_PORT=17321 bash && sleep 2 && curl -fsS http://127.0.0.1:17321/health && curl -fsS -u admin:pass http://127.0.0.1:17321/api/status"`  
+  - 观察点：`/health` 返回 ok，`/api/status` 在 Basic Auth 下返回 200  
+
 ## 发布/部署
 
 - Cloudflare Pages：

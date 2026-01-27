@@ -101,12 +101,12 @@ app.use("/api/*", async (c, next) => {
   const authState = resolveAuthState();
   if (!authState.configured) {
     if (authAllowUnconfigured) return next();
-    return c.json({ ok: false, error: "auth not configured" }, 401, authHeaders());
+    return c.json({ ok: false, error: "auth not configured" }, 401);
   }
 
   const header = c.req.header("authorization");
   if (!header || !verifyAuthHeader(header, authState)) {
-    return c.json({ ok: false, error: "unauthorized" }, 401, authHeaders());
+    return c.json({ ok: false, error: "unauthorized" }, 401);
   }
 
   return next();
@@ -402,10 +402,6 @@ function verifyAuthHeader(header: string, authState: AuthState) {
   const password = rest.join(":");
   if (!username || !password) return false;
   return authState.verify(username, password);
-}
-
-function authHeaders() {
-  return { "WWW-Authenticate": 'Basic realm="Clawdbot Manager"' };
 }
 
 function loadManagerConfig(): ManagerConfig | null {

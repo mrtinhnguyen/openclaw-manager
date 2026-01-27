@@ -165,7 +165,7 @@ export const useOnboardingStore = create<OnboardingState>()(
             headers: authHeaders(authHeader)
           });
           if (res.status === 401) {
-            set({ loading: false, authRequired: true, error: "需要登录" });
+            set({ loading: false, authRequired: true, authHeader: null, error: "需要登录" });
             await get().checkAuth();
             return;
           }
@@ -281,7 +281,26 @@ export const useOnboardingStore = create<OnboardingState>()(
       }
     }),
     {
-      name: "clawdbot-manager-ui"
+      name: "clawdbot-manager-ui",
+      version: 2,
+      partialize: (state) => ({
+        apiBase: state.apiBase,
+        gatewayHost: state.gatewayHost,
+        gatewayPort: state.gatewayPort
+      }),
+      migrate: (state) => {
+        const data = (state ?? {}) as {
+          apiBase?: string;
+          gatewayHost?: string;
+          gatewayPort?: string;
+        };
+        return {
+          apiBase: data.apiBase ?? DEFAULT_API_BASE,
+          gatewayHost: data.gatewayHost ?? "127.0.0.1",
+          gatewayPort: data.gatewayPort ?? "18789",
+          authHeader: null
+        };
+      }
     }
   )
 );
