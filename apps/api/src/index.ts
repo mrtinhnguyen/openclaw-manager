@@ -142,6 +142,24 @@ app.post("/api/processes/stop", async (c) => {
   return c.json(result.ok ? { ok: true, process: result.process } : result, result.ok ? 200 : 400);
 });
 
+app.post("/api/cli/install", async (c) => {
+  const cli = await getCliStatus();
+  if (cli.installed) {
+    return c.json({ ok: true, alreadyInstalled: true, version: cli.version });
+  }
+
+  try {
+    await runCommand("npm", ["i", "-g", "clawdbot@latest"], 120_000);
+    const updated = await getCliStatus();
+    return c.json({ ok: true, version: updated.version });
+  } catch (err) {
+    return c.json(
+      { ok: false, error: err instanceof Error ? err.message : String(err) },
+      500
+    );
+  }
+});
+
 app.post("/api/discord/token", async (c) => {
   const body = await c.req.json().catch(() => null);
   const token = typeof body?.token === "string" ? body.token.trim() : "";
@@ -188,6 +206,11 @@ app.post("/api/quickstart", async (c) => {
 
   let gatewayReady = false;
   let probeOk: boolean | undefined;
+
+  const cli = await getCliStatus();
+  if (!cli.installed) {
+    return c.json({ ok: false, error: "clawdbot CLI not installed" }, 400);
+  }
 
   if (startGateway) {
     const started = startProcess("gateway-run");

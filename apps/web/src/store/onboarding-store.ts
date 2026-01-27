@@ -74,6 +74,7 @@ type OnboardingState = {
   refresh: () => Promise<void>;
   startProcess: (id: string) => Promise<void>;
   stopProcess: (id: string) => Promise<void>;
+  installCli: () => Promise<{ ok: boolean; error?: string; version?: string | null; alreadyInstalled?: boolean }>;
   setDiscordToken: (token: string) => Promise<{ ok: boolean; error?: string }>;
   approveDiscordPairing: (code: string) => Promise<{ ok: boolean; error?: string }>;
   quickstart: (opts?: { runProbe?: boolean; startGateway?: boolean }) => Promise<{
@@ -146,6 +147,26 @@ export const useOnboardingStore = create<OnboardingState>()(
           body: JSON.stringify({ id })
         });
         await get().refresh();
+      },
+      installCli: async () => {
+        const { apiBase } = get();
+        try {
+          const res = await fetch(`${apiBase}/api/cli/install`, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({})
+          });
+          const data = (await res.json()) as {
+            ok: boolean;
+            error?: string;
+            version?: string | null;
+            alreadyInstalled?: boolean;
+          };
+          await get().refresh();
+          return data;
+        } catch (err) {
+          return { ok: false, error: err instanceof Error ? err.message : String(err) };
+        }
       },
       setDiscordToken: async (token) => {
         const { apiBase } = get();

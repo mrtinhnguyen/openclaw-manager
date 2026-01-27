@@ -1,7 +1,78 @@
-import { ArrowRight, Check, ExternalLink, Loader2, MessageCircle, Search, Shield } from "lucide-react";
+import { ArrowRight, Check, ExternalLink, Loader2, MessageCircle, Search, Shield, Terminal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+
+// ============================================
+// CLI Step
+// ============================================
+
+interface CliStepProps {
+    installed: boolean;
+    version: string | null;
+    isChecking: boolean;
+    isProcessing: boolean;
+    message: string | null;
+    onInstall: () => void;
+}
+
+export function CliStep({
+    installed,
+    version,
+    isChecking,
+    isProcessing,
+    message,
+    onInstall
+}: CliStepProps) {
+    const statusText = installed
+        ? "CLI 已就绪，正在进入下一步..."
+        : isChecking
+            ? "正在检测本机 CLI 环境..."
+            : "未检测到 CLI，请先完成安装。";
+
+    return (
+        <div className="space-y-6 p-8 text-center">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-accent/10">
+                {installed ? (
+                    <Check className="h-10 w-10 text-success animate-bounce-once" />
+                ) : isChecking ? (
+                    <Loader2 className="h-10 w-10 text-accent animate-spin" />
+                ) : (
+                    <Terminal className="h-10 w-10 text-accent" />
+                )}
+            </div>
+            <div>
+                <h2 className="text-2xl font-semibold">安装 Clawdbot CLI</h2>
+                <p className="mt-2 text-sm text-muted">{statusText}</p>
+            </div>
+            {installed ? (
+                <div className="rounded-2xl bg-success/10 px-4 py-2 text-sm text-success text-center">
+                    已检测到 CLI{version ? `（${version}）` : ""}。
+                </div>
+            ) : (
+                <Button
+                    onClick={onInstall}
+                    disabled={isProcessing || isChecking}
+                    size="lg"
+                    className="w-full"
+                >
+                    {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                    一键安装 CLI
+                </Button>
+            )}
+            <div className="rounded-2xl bg-line/20 p-4 text-left text-xs text-muted">
+                <div className="mb-2 text-[11px] uppercase tracking-widest text-muted">手动安装</div>
+                <code className="break-words">npm i -g clawdbot@latest</code>
+                <div className="mt-2 text-[11px]">如提示权限不足，可改用 sudo 执行。</div>
+            </div>
+            {message && (
+                <div className="rounded-2xl bg-line/30 px-4 py-2 text-xs text-muted text-center">
+                    {message}
+                </div>
+            )}
+        </div>
+    );
+}
 
 // ============================================
 // Gateway Step

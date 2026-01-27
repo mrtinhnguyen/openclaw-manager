@@ -2,33 +2,46 @@ import { useCallback, useEffect, useState } from "react";
 
 import { Card } from "@/components/ui/card";
 import { WizardSidebar, MobileProgress, WizardStep } from "@/components/wizard-sidebar";
-import { GatewayStep, TokenStep, PairingStep, ProbeStep, CompleteStep } from "@/components/wizard-steps";
+import {
+  CliStep,
+  GatewayStep,
+  TokenStep,
+  PairingStep,
+  ProbeStep,
+  CompleteStep
+} from "@/components/wizard-steps";
 import { useOnboardingStore } from "@/store/onboarding-store";
 
 export default function App() {
   const {
     status,
     error,
+    loading,
     refresh,
+    installCli,
     setDiscordToken,
     approveDiscordPairing,
     quickstart
   } = useOnboardingStore();
 
-  const [currentStep, setCurrentStep] = useState<WizardStep>("gateway");
+  const [currentStep, setCurrentStep] = useState<WizardStep>("cli");
   const [tokenInput, setTokenInput] = useState("");
   const [pairingInput, setPairingInput] = useState("");
   const [message, setMessage] = useState<string | null>(null);
+  const [cliMessage, setCliMessage] = useState<string | null>(null);
   const [probeMessage, setProbeMessage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [autoStarted, setAutoStarted] = useState(false);
 
   // Derived states
+  const cliInstalled = Boolean(status?.cli.installed);
+  const cliVersion = status?.cli.version ?? null;
   const gatewayOk = Boolean(status?.gateway.ok);
   const tokenConfigured = Boolean(status?.onboarding?.discord.tokenConfigured);
   const allowFromConfigured = Boolean(status?.onboarding?.discord.allowFromConfigured);
   const probeOk = status?.onboarding?.probe?.ok === true;
   const pendingPairings = status?.onboarding?.discord.pendingPairings ?? 0;
+  const cliChecking = !status && loading;
 
   // Polling
   useEffect(() => {
@@ -39,7 +52,7 @@ export default function App() {
 
   // Auto-start gateway on mount
   useEffect(() => {
-    if (autoStarted || !status) return;
+    if (autoStarted || !status || !cliInstalled) return;
     if (gatewayOk) {
       setAutoStarted(true);
       return;
@@ -60,7 +73,9 @@ export default function App() {
   // Auto-advance steps based on current state
   useEffect(() => {
     if (!status) return;
-    if (probeOk) {
+    if (!cliInstalled) {
+      setCurrentStep("cli");
+    } else if (probeOk) {
       setCurrentStep("complete");
     } else if (gatewayOk && tokenConfigured && allowFromConfigured) {
       setCurrentStep("probe");
@@ -74,6 +89,18 @@ export default function App() {
   }, [status, gatewayOk, tokenConfigured, allowFromConfigured, probeOk]);
 
   // Handlers
+  const handleCliInstall = useCallback(async () => {
+    setIsProcessing(true);
+    setCliMessage("正在安装 CLI...");
+    const result = await installCli();
+    if (result.ok) {
+      setCliMessage(result.alreadyInstalled ? "CLI 已就绪。" : "安装完成，正在刷新状态...");
+    } else {
+      setCliMessage(`安装失败: ${result.error}`);
+    }
+    setIsProcessing(false);
+  }, [installCli]);
+
   const handleTokenSubmit = useCallback(async () => {
     if (!tokenInput.trim()) return;
     setIsProcessing(true);
@@ -136,7 +163,9 @@ export default function App() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Enter" && !e.shiftKey && !isProcessing) {
-        if (currentStep === "token" && tokenInput.trim()) {
+        if (currentStep === "cli" && !cliInstalled) {
+          handleCliInstall();
+        } else if (currentStep === "token" && tokenInput.trim()) {
           handleTokenSubmit();
         } else if (currentStep === "pairing" && pairingInput.trim()) {
           handlePairingSubmit();
@@ -149,9 +178,11 @@ export default function App() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [
     currentStep,
+    cliInstalled,
     tokenInput,
     pairingInput,
     isProcessing,
+    handleCliInstall,
     handleTokenSubmit,
     handlePairingSubmit,
     handleProbe
@@ -177,6 +208,17 @@ export default function App() {
 
           {/* Main wizard card */}
           <Card className="animate-fade-up overflow-hidden">
+            {currentStep === "cli" && (
+              <CliStep
+                installed={cliInstalled}
+                version={cliVersion}
+                isChecking={cliChecking}
+                isProcessing={isProcessing}
+                message={cliMessage}
+                onInstall={handleCliInstall}
+              />
+            )}
+
             {currentStep === "gateway" && (
               <GatewayStep
                 isReady={gatewayOk}
