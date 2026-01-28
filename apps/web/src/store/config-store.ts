@@ -1,10 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-const DEFAULT_API_BASE =
-  import.meta.env.VITE_MANAGER_API_URL ??
-  import.meta.env.VITE_ONBOARDING_API_URL ??
-  "http://127.0.0.1:17321";
+const LEGACY_DEFAULT_API_BASE = "http://127.0.0.1:17321";
+const DEFAULT_API_BASE = resolveDefaultApiBase();
 
 export type ConfigState = {
   apiBase: string;
@@ -26,7 +24,7 @@ export type ConfigState = {
 export const useConfigStore = create<ConfigState>()(
   persist(
     (set, get) => ({
-      apiBase: normalizeBase(DEFAULT_API_BASE),
+      apiBase: DEFAULT_API_BASE,
       gatewayHost: "127.0.0.1",
       gatewayPort: "18789",
       authHeader: null,
@@ -77,7 +75,7 @@ export const useConfigStore = create<ConfigState>()(
     }),
     {
       name: "clawdbot-manager-ui",
-      version: 3,
+      version: 4,
       partialize: (state) => ({
         apiBase: state.apiBase,
         gatewayHost: state.gatewayHost,
@@ -89,8 +87,12 @@ export const useConfigStore = create<ConfigState>()(
           gatewayHost?: string;
           gatewayPort?: string;
         };
+        const storedBase = data.apiBase ? normalizeBase(data.apiBase) : null;
+        const defaultBase = DEFAULT_API_BASE;
+        const resolvedBase =
+          storedBase && storedBase !== LEGACY_DEFAULT_API_BASE ? storedBase : defaultBase;
         return {
-          apiBase: data.apiBase ?? DEFAULT_API_BASE,
+          apiBase: resolvedBase,
           gatewayHost: data.gatewayHost ?? "127.0.0.1",
           gatewayPort: data.gatewayPort ?? "18789"
         };
@@ -98,6 +100,16 @@ export const useConfigStore = create<ConfigState>()(
     }
   )
 );
+
+function resolveDefaultApiBase() {
+  const envBase =
+    import.meta.env.VITE_MANAGER_API_URL ?? import.meta.env.VITE_ONBOARDING_API_URL;
+  if (envBase) return normalizeBase(envBase);
+  if (typeof window !== "undefined" && window.location?.origin) {
+    return normalizeBase(window.location.origin);
+  }
+  return LEGACY_DEFAULT_API_BASE;
+}
 
 function normalizeBase(value: string) {
   return value.trim().replace(/\/+$/, "");
