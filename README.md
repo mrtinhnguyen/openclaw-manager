@@ -40,6 +40,15 @@ pnpm deploy:pages
 curl -fsSL https://clawdbot-manager.pages.dev/install.sh | MANAGER_REPO_URL=<git-repo-url> bash
 ```
 
+## Windows 一键安装（PowerShell）
+
+```powershell
+$env:MANAGER_REPO_URL="git@github.com:your-org/clawdbot-manager.git"
+$env:MANAGER_ADMIN_USER="admin"
+$env:MANAGER_ADMIN_PASS="pass"
+irm https://clawdbot-manager.pages.dev/install.ps1 | iex
+```
+
 可选环境变量：
 
 - `MANAGER_INSTALL_DIR`
@@ -49,7 +58,7 @@ curl -fsSL https://clawdbot-manager.pages.dev/install.sh | MANAGER_REPO_URL=<git
 - `MANAGER_API_HOST`（默认 `0.0.0.0`）
 - `MANAGER_API_PORT`（默认 `17321`）
 
-脚本来源：`apps/web/public/install.sh`（`scripts/install.sh` 为本地转发）
+脚本来源：`apps/web/public/install.sh` / `apps/web/public/install.ps1`（`scripts/install.sh` 为本地转发）
 
 ## 目录结构
 
