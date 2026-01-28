@@ -85,7 +85,7 @@ export function createProcessManager(commandRegistry: CommandDefinition[]) {
     if (!def.allowRun) return { ok: false, error: "not allowed" } as const;
 
     const existing = processRegistry.get(id);
-    if (existing?.child && !existing.child.killed) {
+    if (existing?.child && !existing.child.killed && existing.exitCode == null) {
       return { ok: true, process: snapshotProcess(def, existing) } as const;
     }
 
@@ -122,6 +122,11 @@ export function createProcessManager(commandRegistry: CommandDefinition[]) {
     child.stdout?.on("data", (chunk) => pushLog(chunk.toString()));
     child.stderr?.on("data", (chunk) => pushLog(chunk.toString()));
 
+    child.on("error", (err) => {
+      managed.exitCode = 1;
+      pushLog(`spawn error: ${err.message}`);
+    });
+
     child.on("close", (code) => {
       managed.exitCode = code ?? null;
     });
@@ -153,7 +158,7 @@ export function createProcessManager(commandRegistry: CommandDefinition[]) {
 }
 
 function snapshotProcess(def: CommandDefinition, managed: ManagedProcess | null): ProcessSnapshot {
-  const running = Boolean(managed?.child && !managed.child.killed);
+  const running = Boolean(managed?.child && !managed.child.killed && managed.exitCode == null);
   return {
     id: def.id,
     title: def.title,
