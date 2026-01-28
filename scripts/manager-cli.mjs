@@ -12,6 +12,7 @@ if (!cmd || cmd === "help" || flags.help) {
 
 const apiBase = resolveApiBase(flags);
 const auth = resolveAuth(flags);
+const nonInteractive = isNonInteractive(flags);
 
 try {
   if (cmd === "status") {
@@ -21,6 +22,17 @@ try {
     });
     const data = await requestJson("GET", `${apiBase}/api/status${query}`, null, auth);
     console.log(JSON.stringify(data, null, 2));
+    process.exit(0);
+  }
+
+  if (cmd === "apply") {
+    const configPath = flags.config ?? flags.c ?? "manager.toml";
+    const config = await loadTomlConfig(configPath);
+    const apiFromConfig = resolveApiBaseFromConfig(config);
+    const authFromConfig = resolveAuthFromConfig(config);
+    const targetApi = apiFromConfig ?? apiBase;
+    const targetAuth = authFromConfig ?? auth;
+    await applyConfig(config, targetApi, targetAuth, { nonInteractive });
     process.exit(0);
   }
 
@@ -88,6 +100,26 @@ try {
     process.exit(0);
   }
 
+  if (cmd === "pairing-prompt") {
+    ensureInteractive(nonInteractive);
+    const code = await promptForInput("请输入配对码并回车确认（留空取消）：");
+    if (!code) throw new Error("missing pairing code");
+    await runJob(`${apiBase}/api/jobs/discord/pairing`, { code }, auth);
+    process.exit(0);
+  }
+
+  if (cmd === "pairing-wait") {
+    const timeoutMs = parseNumberFlag(flags.timeout ?? flags["timeout-ms"]);
+    const pollMs = parseNumberFlag(flags.poll ?? flags["poll-ms"]);
+    const notify = Boolean(flags.notify);
+    const payload = {};
+    if (timeoutMs) payload.timeoutMs = timeoutMs;
+    if (pollMs) payload.pollMs = pollMs;
+    if (notify) payload.notify = true;
+    await runJob(`${apiBase}/api/jobs/discord/pairing/wait`, payload, auth);
+    process.exit(0);
+  }
+
   if (cmd === "gateway-start") {
     const data = await requestJson(
       "POST",
@@ -140,6 +172,13 @@ function resolveApiBase(flags) {
   return base.replace(/\/+$/, "");
 }
 
+function resolveApiBaseFromConfig(config) {
+  const api = config?.api ?? {};
+  const base = api.base ?? api.url;
+  if (!base || typeof base !== "string") return null;
+  return base.replace(/\/+$/, "");
+}
+
 function resolveAuth(flags) {
   const user =
     flags.user ??
@@ -153,6 +192,14 @@ function resolveAuth(flags) {
     process.env.MANAGER_AUTH_PASS ??
     process.env.MANAGER_ADMIN_PASS ??
     "";
+  if (!user || !pass) return null;
+  return buildBasicAuth(user, pass);
+}
+
+function resolveAuthFromConfig(config) {
+  const admin = config?.admin ?? {};
+  const user = typeof admin.user === "string" ? admin.user : "";
+  const pass = typeof admin.pass === "string" ? admin.pass : "";
   if (!user || !pass) return null;
   return buildBasicAuth(user, pass);
 }
@@ -271,17 +318,256 @@ Usage:
 
 Commands:
   status                  Show status snapshot
+  apply                   Run steps from a TOML config
   login                   Verify login (use --user/--pass)
   quickstart              Start gateway (optional --run-probe)
   probe                   Run probe (defaults to start gateway)
   discord-token           Save Discord bot token
   ai-auth                 Save AI provider key
   pairing-approve         Approve pairing code
+  pairing-prompt          Prompt for pairing code in CLI
+  pairing-wait            Wait for a pairing request and approve
   gateway-start           Start gateway process
 
 Common flags:
   --api <base>            API base (default: http://127.0.0.1:17321)
   --user <user>           Auth username (or MANAGER_AUTH_USER)
   --pass <pass>           Auth password (or MANAGER_AUTH_PASS)
+  --non-interactive       Disable prompts (or MANAGER_NON_INTERACTIVE=1)
 `);
+}
+
+async function applyConfig(config, apiBaseUrl, authHeader, options) {
+  console.log("apply: status");
+  await requestJson("GET", `${apiBaseUrl}/api/status`, null, authHeader);
+
+  const install = config?.install ?? {};
+  const gateway = config?.gateway ?? {};
+  const discord = config?.discord ?? {};
+  const ai = config?.ai ?? {};
+  const pairing = config?.pairing ?? {};
+
+  const installCli = install.cli !== false;
+  const startGateway = gateway.start !== false;
+  const runProbe = Boolean(gateway.probe);
+
+  if (installCli) {
+    console.log("apply: install cli");
+    await runJob(`${apiBaseUrl}/api/jobs/cli-install`, {}, authHeader);
+  }
+
+  if (typeof discord.token === "string" && discord.token.trim()) {
+    console.log("apply: discord token");
+    const data = await requestJson(
+      "POST",
+      `${apiBaseUrl}/api/discord/token`,
+      { token: discord.token.trim() },
+      authHeader
+    );
+    if (!data.ok) throw new Error(data.error ?? "discord token failed");
+  }
+
+  if (typeof ai.provider === "string" && typeof ai.key === "string") {
+    const provider = ai.provider.trim();
+    const key = ai.key.trim();
+    if (provider && key) {
+      console.log(`apply: ai auth (${provider})`);
+      await runJob(`${apiBaseUrl}/api/jobs/ai/auth`, { provider, apiKey: key }, authHeader);
+    }
+  }
+
+  if (startGateway || runProbe) {
+    console.log("apply: quickstart");
+    await runJob(
+      `${apiBaseUrl}/api/jobs/quickstart`,
+      { startGateway, runProbe },
+      authHeader
+    );
+  }
+
+  const pairingWait = pairing.wait === true;
+  const pairingPrompt = pairing.prompt === true || pairing.manual === true;
+  const pairingTimeoutMs = parseNumberFlag(pairing.timeoutMs ?? pairing.timeout);
+  const pairingPollMs = parseNumberFlag(pairing.pollMs ?? pairing.poll);
+  const pairingNotify = Boolean(pairing.notify);
+
+  if (pairingPrompt) {
+    console.log("apply: pairing prompt");
+    ensureInteractive(options?.nonInteractive ?? false);
+    const code = await promptForInput("请输入配对码并回车确认（留空取消）：");
+    if (!code) {
+      throw new Error("pairing code required");
+    }
+    await runJob(`${apiBaseUrl}/api/jobs/discord/pairing`, { code }, authHeader);
+  }
+
+  if (!pairingPrompt && pairingWait) {
+    console.log("apply: pairing wait");
+    const payload = {};
+    if (pairingTimeoutMs) payload.timeoutMs = pairingTimeoutMs;
+    if (pairingPollMs) payload.pollMs = pairingPollMs;
+    if (pairingNotify) payload.notify = true;
+    await runJob(`${apiBaseUrl}/api/jobs/discord/pairing/wait`, payload, authHeader);
+  }
+
+  if (!pairingPrompt && !pairingWait && Array.isArray(pairing.codes) && pairing.codes.length) {
+    for (const raw of pairing.codes) {
+      const code = String(raw).trim();
+      if (!code) continue;
+      console.log(`apply: pairing approve (${code})`);
+      await runJob(`${apiBaseUrl}/api/jobs/discord/pairing`, { code }, authHeader);
+    }
+  }
+}
+
+function isNonInteractive(flags) {
+  return (
+    flags["non-interactive"] === true ||
+    process.env.MANAGER_NON_INTERACTIVE === "1" ||
+    process.env.CI === "1"
+  );
+}
+
+function ensureInteractive(nonInteractiveFlag) {
+  if (!nonInteractiveFlag) return;
+  throw new Error(
+    "non-interactive: pairing code required. Use pairing-approve after you get the code."
+  );
+}
+
+async function promptForInput(message) {
+  if (!process.stdin.isTTY) {
+    throw new Error("stdin is not interactive");
+  }
+  const readline = await import("node:readline/promises");
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  try {
+    const answer = await rl.question(message);
+    return answer.trim().toUpperCase();
+  } finally {
+    rl.close();
+  }
+}
+
+function parseNumberFlag(value) {
+  if (value === undefined || value === null) return null;
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed <= 0) return null;
+  return Math.floor(parsed);
+}
+
+async function loadTomlConfig(configPath) {
+  const fs = await import("node:fs/promises");
+  const text = await fs.readFile(configPath, "utf-8");
+  return parseToml(text);
+}
+
+function parseToml(input) {
+  const root = {};
+  let current = root;
+
+  const lines = input.split(/\r?\n/);
+  for (const raw of lines) {
+    const line = stripComment(raw).trim();
+    if (!line) continue;
+    if (line.startsWith("[") && line.endsWith("]")) {
+      const section = line.slice(1, -1).trim();
+      if (!section) continue;
+      current = ensurePath(root, section.split("."));
+      continue;
+    }
+    const idx = line.indexOf("=");
+    if (idx === -1) continue;
+    const key = line.slice(0, idx).trim();
+    const valueRaw = line.slice(idx + 1).trim();
+    const value = parseTomlValue(valueRaw);
+    setPath(current, key.split("."), value);
+  }
+  return root;
+}
+
+function stripComment(line) {
+  const hashIndex = line.indexOf("#");
+  if (hashIndex === -1) return line;
+  return line.slice(0, hashIndex);
+}
+
+function parseTomlValue(raw) {
+  if (!raw) return "";
+  if (raw.startsWith("[") && raw.endsWith("]")) {
+    const inner = raw.slice(1, -1).trim();
+    if (!inner) return [];
+    return splitArray(inner).map(parseTomlValue);
+  }
+  if (
+    (raw.startsWith('"') && raw.endsWith('"')) ||
+    (raw.startsWith("'") && raw.endsWith("'"))
+  ) {
+    return raw.slice(1, -1);
+  }
+  if (raw === "true") return true;
+  if (raw === "false") return false;
+  if (/^-?\d+(\.\d+)?$/.test(raw)) return Number(raw);
+  return raw;
+}
+
+function splitArray(raw) {
+  const items = [];
+  let current = "";
+  let inQuotes = false;
+  let quoteChar = "";
+  for (let i = 0; i < raw.length; i += 1) {
+    const ch = raw[i];
+    if ((ch === '"' || ch === "'") && (!inQuotes || ch === quoteChar)) {
+      if (!inQuotes) {
+        inQuotes = true;
+        quoteChar = ch;
+      } else {
+        inQuotes = false;
+      }
+      current += ch;
+      continue;
+    }
+    if (ch === "," && !inQuotes) {
+      if (current.trim()) items.push(current.trim());
+      current = "";
+      continue;
+    }
+    current += ch;
+  }
+  if (current.trim()) items.push(current.trim());
+  return items;
+}
+
+function ensurePath(root, parts) {
+  let target = root;
+  for (const part of parts) {
+    if (!part) continue;
+    if (!Object.prototype.hasOwnProperty.call(target, part)) {
+      target[part] = {};
+    }
+    const next = target[part];
+    if (typeof next !== "object" || next === null) {
+      target[part] = {};
+    }
+    target = target[part];
+  }
+  return target;
+}
+
+function setPath(root, parts, value) {
+  if (!parts.length) return;
+  let target = root;
+  for (let i = 0; i < parts.length - 1; i += 1) {
+    const part = parts[i];
+    if (!Object.prototype.hasOwnProperty.call(target, part)) {
+      target[part] = {};
+    }
+    const next = target[part];
+    if (typeof next !== "object" || next === null) {
+      target[part] = {};
+    }
+    target = target[part];
+  }
+  target[parts[parts.length - 1]] = value;
 }

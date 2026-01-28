@@ -13,11 +13,19 @@
 - `MANAGER_AUTH_USER=admin`
 - `MANAGER_AUTH_PASS=pass`
 
+非交互模式：
+- `MANAGER_NON_INTERACTIVE=1`
+
 ## 步骤命令
 
 查看状态：
 ```bash
 pnpm manager:status
+```
+
+一键应用配置（TOML）：
+```bash
+pnpm manager:apply -- --config ./manager.toml
 ```
 
 启动网关（快速启动）：
@@ -45,7 +53,58 @@ pnpm manager:ai-auth -- --provider minimax-cn --key "YOUR_API_KEY"
 pnpm manager:pairing-approve -- --code "ABCDE123"
 ```
 
+交互式输入配对码：
+```bash
+pnpm manager:pairing-prompt
+```
+
+非交互模式（不弹出输入）：
+```bash
+pnpm manager:apply -- --config ./manager.toml --non-interactive
+```
+
+等待配对请求并自动批准：
+```bash
+pnpm manager:pairing-wait -- --timeout 180000 --poll 3000 --notify
+```
+提示：配对请求需要由用户向机器人发送一条 DM 触发，命令会自动等待并批准。
+
 ## 常见问题
 
 - `unauthorized`：设置 `MANAGER_AUTH_USER/MANAGER_AUTH_PASS`
 - `request failed: 404/500`：确认 API 正在运行，且 `--api` 指向正确端口
+
+## 配置样例（TOML）
+
+`manager.toml`：
+```toml
+[api]
+base = "http://127.0.0.1:17331"
+
+[admin]
+user = "admin"
+pass = "pass"
+
+[install]
+cli = true
+
+[discord]
+token = "YOUR_DISCORD_BOT_TOKEN"
+
+[ai]
+provider = "minimax-cn"
+key = "YOUR_API_KEY"
+
+[gateway]
+start = true
+probe = true
+
+[pairing]
+# 三选一：prompt/wait/codes（优先级：prompt > wait > codes）
+prompt = true
+# wait = true
+# timeoutMs = 180000
+# pollMs = 3000
+# notify = true
+# codes = ["ABCDE123"]
+```

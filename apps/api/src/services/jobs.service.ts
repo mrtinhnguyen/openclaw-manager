@@ -1,11 +1,14 @@
 import type { ApiDeps } from "../deps.js";
 import { getCliStatus } from "../lib/system.js";
 import { runCommandWithLogs } from "../lib/runner.js";
-import { parsePositiveInt } from "../lib/utils.js";
+import { parsePositiveInt, sleep } from "../lib/utils.js";
 import { runQuickstart, type QuickstartRequest } from "./quickstart.service.js";
 import { downloadResource, type DownloadOptions } from "./resource.service.js";
 
 const MINIMAX_CN_BASE_URL = "https://api.minimaxi.com/anthropic";
+const DEFAULT_PAIRING_WAIT_TIMEOUT_MS = 180_000;
+const DEFAULT_PAIRING_POLL_MS = 3000;
+const DEFAULT_PAIRING_APPROVE_TIMEOUT_MS = 8000;
 
 export function createCliInstallJob(deps: ApiDeps) {
   const job = deps.jobStore.createJob("Install Clawdbot CLI");
@@ -98,6 +101,64 @@ export function createDiscordPairingJob(deps: ApiDeps, code: string) {
   return job.id;
 }
 
+export function createDiscordPairingWaitJob(
+  deps: ApiDeps,
+  options: { timeoutMs?: number | string; pollMs?: number | string; notify?: boolean }
+) {
+  const job = deps.jobStore.createJob("Discord Pairing Wait");
+  deps.jobStore.startJob(job.id);
+  deps.jobStore.appendLog(job.id, "等待配对请求...");
+
+  const timeoutMs =
+    parsePositiveInt(toOptionalString(options.timeoutMs)) ??
+    parsePositiveInt(process.env.MANAGER_PAIRING_TIMEOUT_MS) ??
+    DEFAULT_PAIRING_WAIT_TIMEOUT_MS;
+  const pollMs =
+    parsePositiveInt(toOptionalString(options.pollMs)) ??
+    parsePositiveInt(process.env.MANAGER_PAIRING_POLL_MS) ??
+    DEFAULT_PAIRING_POLL_MS;
+  const notify = Boolean(options.notify);
+
+  void (async () => {
+    const startedAt = Date.now();
+    let lastCount = -1;
+    while (Date.now() - startedAt < timeoutMs) {
+      const snapshot = await fetchDiscordPairings(deps);
+      if (snapshot.error) {
+        deps.jobStore.appendLog(job.id, `读取配对请求失败: ${snapshot.error}`);
+      }
+      if (snapshot.count !== lastCount) {
+        deps.jobStore.appendLog(job.id, `待处理配对请求: ${snapshot.count}`);
+        lastCount = snapshot.count;
+      }
+      if (snapshot.code) {
+        deps.jobStore.appendLog(job.id, "发现配对请求，开始批准...");
+        const args = notify
+          ? ["pairing", "approve", "--notify", "discord", snapshot.code]
+          : ["pairing", "approve", "discord", snapshot.code];
+        await runCommandWithLogs("clawdbot", args, {
+          cwd: deps.repoRoot,
+          env: process.env,
+          timeoutMs: DEFAULT_PAIRING_APPROVE_TIMEOUT_MS,
+          onLog: (line) => deps.jobStore.appendLog(job.id, line)
+        });
+        deps.jobStore.appendLog(job.id, "配对已提交。");
+        deps.jobStore.completeJob(job.id, { approved: true, notified: notify });
+        return;
+      }
+      await sleep(pollMs);
+    }
+    deps.jobStore.appendLog(job.id, "等待配对超时。");
+    deps.jobStore.failJob(job.id, "pairing timeout");
+  })().catch((err: unknown) => {
+    const message = err instanceof Error ? err.message : String(err);
+    deps.jobStore.appendLog(job.id, `配对失败: ${message}`);
+    deps.jobStore.failJob(job.id, message);
+  });
+
+  return job.id;
+}
+
 export function createResourceDownloadJob(
   deps: ApiDeps,
   options: { url?: string; filename?: string }
@@ -131,6 +192,40 @@ export function createResourceDownloadJob(
     });
 
   return job.id;
+}
+
+function toOptionalString(value: number | string | undefined) {
+  if (typeof value === "number") return String(value);
+  if (typeof value === "string") return value;
+  return undefined;
+}
+
+async function fetchDiscordPairings(deps: ApiDeps): Promise<{
+  code: string | null;
+  count: number;
+  error?: string;
+}> {
+  try {
+    const output = await deps.runCommand(
+      "clawdbot",
+      ["pairing", "list", "--channel", "discord", "--json"],
+      8000
+    );
+    const parsed = JSON.parse(output) as {
+      requests?: Array<{ code?: string; pairingCode?: string }>;
+    };
+    const requests = Array.isArray(parsed?.requests) ? parsed.requests : [];
+    const first = requests[0];
+    const codeRaw = typeof first?.code === "string" ? first.code : first?.pairingCode;
+    const code = typeof codeRaw === "string" && codeRaw.trim() ? codeRaw.trim() : null;
+    return { code, count: requests.length };
+  } catch (err) {
+    return {
+      code: null,
+      count: 0,
+      error: err instanceof Error ? err.message : String(err)
+    };
+  }
 }
 
 export function createAiAuthJob(

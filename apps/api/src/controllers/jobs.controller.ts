@@ -5,6 +5,7 @@ import {
   createCliInstallJob,
   createAiAuthJob,
   createDiscordPairingJob,
+  createDiscordPairingWaitJob,
   createQuickstartJob,
   createResourceDownloadJob
 } from "../services/jobs.service.js";
@@ -35,6 +36,17 @@ export function createDiscordPairingJobHandler(deps: ApiDeps): Handler {
     const code = typeof body?.code === "string" ? body.code.trim().toUpperCase() : "";
     if (!code) return c.json({ ok: false, error: "missing code" }, 400);
     const jobId = createDiscordPairingJob(deps, code);
+    return c.json({ ok: true, jobId });
+  };
+}
+
+export function createDiscordPairingWaitJobHandler(deps: ApiDeps): Handler {
+  return async (c) => {
+    const body = await c.req.json().catch(() => null);
+    const timeoutMs = body?.timeoutMs;
+    const pollMs = body?.pollMs;
+    const notify = Boolean(body?.notify);
+    const jobId = createDiscordPairingWaitJob(deps, { timeoutMs, pollMs, notify });
     return c.json({ ok: true, jobId });
   };
 }
