@@ -7,6 +7,8 @@
 - `docs/logs/v0.0.5-cross-platform-install/README.md`
 - `docs/logs/v0.0.6-default-repo/README.md`
 - `docs/logs/v0.0.7-process-spawn-guard/README.md`
+- `docs/logs/v0.0.8-docker-deploy/README.md`
+- `docs/logs/v0.0.9-docker-script/README.md`
 
 ## 写日志的标准
 

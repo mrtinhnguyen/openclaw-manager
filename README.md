@@ -40,6 +40,10 @@ pnpm deploy:pages
 curl -fsSL https://clawdbot-manager.pages.dev/install.sh | bash
 ```
 
+## Docker 部署（对外文档）
+
+完整指引：`docs/docker.md`
+
 ## Windows 一键安装（PowerShell）
 
 ```powershell
