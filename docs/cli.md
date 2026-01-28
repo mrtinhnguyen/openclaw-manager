@@ -140,6 +140,11 @@ pnpm manager:status
 pnpm manager:quickstart
 ```
 
+停止网关：
+```bash
+pnpm manager:gateway-stop
+```
+
 执行通道探测：
 ```bash
 pnpm manager:probe

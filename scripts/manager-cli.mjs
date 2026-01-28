@@ -184,6 +184,20 @@ try {
     process.exit(0);
   }
 
+  if (cmd === "gateway-stop") {
+    const auth = await resolveAuthHeader({ flags, config, nonInteractive });
+    const id = typeof flags.id === "string" && flags.id.trim() ? flags.id.trim() : "gateway-run";
+    const data = await requestJson(
+      "POST",
+      `${apiBase}/api/processes/stop`,
+      { id },
+      auth
+    );
+    if (!data.ok) throw new Error(data.error ?? "gateway stop failed");
+    console.log(`gateway stop requested (${id})`);
+    process.exit(0);
+  }
+
   throw new Error(`unknown command: ${cmd}`);
 } catch (err) {
   console.error(formatError(err));
@@ -477,6 +491,7 @@ Commands:
   pairing-prompt          Prompt for pairing code in CLI
   pairing-wait            Wait for a pairing request and approve
   gateway-start           Start gateway process
+  gateway-stop            Stop gateway process
 
 Common flags:
   --api <base>            API base (default: http://127.0.0.1:17321)

@@ -17,6 +17,7 @@
 - `docs/logs/v0.0.15-probe-retry/README.md`
 - `docs/logs/v0.0.16-cli-toml-config/README.md`
 - `docs/logs/v0.0.17-cli-user-doc/README.md`
+- `docs/logs/v0.0.18-cli-gateway-stop/README.md`
 
 ## 写日志的标准
 
