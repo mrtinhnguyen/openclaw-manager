@@ -48,6 +48,18 @@ export default function App() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [autoStarted, setAutoStarted] = useState(false);
 
+  const stepOrder: WizardStep[] = [
+    "auth",
+    "cli",
+    "gateway",
+    "token",
+    "ai",
+    "pairing",
+    "probe",
+    "complete"
+  ];
+  const stepIndex = (step: WizardStep) => stepOrder.indexOf(step);
+
   // Derived states
   const cliInstalled = Boolean(status?.cli.installed);
   const cliVersion = status?.cli.version ?? null;
@@ -137,21 +149,32 @@ export default function App() {
     if (!status) return;
     if (authRequired && !authHeader) {
       setCurrentStep("auth");
-    } else if (!cliInstalled) {
-      setCurrentStep("cli");
-    } else if (probeOk) {
-      setCurrentStep("complete");
-    } else if (gatewayOk && tokenConfigured && !aiConfigured) {
-      setCurrentStep("ai");
-    } else if (gatewayOk && tokenConfigured && aiConfigured && allowFromConfigured) {
-      setCurrentStep("probe");
-    } else if (gatewayOk && tokenConfigured && aiConfigured) {
-      setCurrentStep("pairing");
-    } else if (gatewayOk) {
-      setCurrentStep("token");
-    } else {
-      setCurrentStep("gateway");
+      return;
     }
+    if (!cliInstalled) {
+      setCurrentStep("cli");
+      return;
+    }
+
+    let target: WizardStep;
+    if (probeOk) {
+      target = "complete";
+    } else if (gatewayOk && tokenConfigured && !aiConfigured) {
+      target = "ai";
+    } else if (gatewayOk && tokenConfigured && aiConfigured && allowFromConfigured) {
+      target = "probe";
+    } else if (gatewayOk && tokenConfigured && aiConfigured) {
+      target = "pairing";
+    } else if (gatewayOk) {
+      target = "token";
+    } else {
+      target = "gateway";
+    }
+
+    setCurrentStep((prev) => {
+      if (prev === target) return prev;
+      return stepIndex(target) > stepIndex(prev) ? target : prev;
+    });
   }, [
     status,
     authRequired,

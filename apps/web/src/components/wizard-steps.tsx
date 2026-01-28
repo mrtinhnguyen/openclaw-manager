@@ -329,6 +329,7 @@ const AI_PROVIDER_OPTIONS = [
     { value: "openai", label: "OpenAI" },
     { value: "openrouter", label: "OpenRouter" },
     { value: "minimax", label: "MiniMax" },
+    { value: "minimax-cn", label: "MiniMax 国内" },
     { value: "gemini", label: "Gemini (Google)" },
     { value: "zai", label: "Z.AI" },
     { value: "moonshot", label: "Moonshot" }

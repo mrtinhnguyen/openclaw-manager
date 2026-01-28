@@ -5,6 +5,8 @@ import { parsePositiveInt } from "../lib/utils.js";
 import { runQuickstart, type QuickstartRequest } from "./quickstart.service.js";
 import { downloadResource, type DownloadOptions } from "./resource.service.js";
 
+const MINIMAX_CN_BASE_URL = "https://api.minimaxi.com/anthropic";
+
 export function createCliInstallJob(deps: ApiDeps) {
   const job = deps.jobStore.createJob("Install Clawdbot CLI");
   deps.jobStore.startJob(job.id);
@@ -172,24 +174,26 @@ export function createAiAuthJob(
     "--skip-daemon"
   ];
 
-  void runCommandWithLogs("clawdbot", args, {
-    cwd: deps.repoRoot,
-    env: {
-      ...process.env,
-      [config.envVar]: apiKey
-    },
-    timeoutMs,
-    onLog: (line) => deps.jobStore.appendLog(job.id, line)
-  })
-    .then(() => {
-      deps.jobStore.appendLog(job.id, "AI 凭证配置完成。");
-      deps.jobStore.completeJob(job.id, { provider });
-    })
-    .catch((err: unknown) => {
-      const message = err instanceof Error ? err.message : String(err);
-      deps.jobStore.appendLog(job.id, `AI 配置失败: ${message}`);
-      deps.jobStore.failJob(job.id, message);
+  void (async () => {
+    await runCommandWithLogs("clawdbot", args, {
+      cwd: deps.repoRoot,
+      env: {
+        ...process.env,
+        [config.envVar]: apiKey
+      },
+      timeoutMs,
+      onLog: (line) => deps.jobStore.appendLog(job.id, line)
     });
+    if (provider === "minimax-cn") {
+      await applyMinimaxCnConfig(deps, job.id, timeoutMs);
+    }
+    deps.jobStore.appendLog(job.id, "AI 凭证配置完成。");
+    deps.jobStore.completeJob(job.id, { provider });
+  })().catch((err: unknown) => {
+    const message = err instanceof Error ? err.message : String(err);
+    deps.jobStore.appendLog(job.id, `AI 配置失败: ${message}`);
+    deps.jobStore.failJob(job.id, message);
+  });
 
   return job.id;
 }
@@ -224,6 +228,9 @@ function resolveAiProviderConfig(
   if (provider === "minimax") {
     return { authChoice: "minimax-api", envVar: "MINIMAX_API_KEY" };
   }
+  if (provider === "minimax-cn") {
+    return { authChoice: "minimax-api", envVar: "MINIMAX_API_KEY" };
+  }
   if (provider === "minimax-lightning") {
     return { authChoice: "minimax-api-lightning", envVar: "MINIMAX_API_KEY" };
   }
@@ -237,4 +244,30 @@ function resolveAiProviderConfig(
     return { authChoice: "opencode-zen", envVar: "OPENCODE_ZEN_API_KEY" };
   }
   return null;
+}
+
+async function applyMinimaxCnConfig(deps: ApiDeps, jobId: string, timeoutMs: number) {
+  deps.jobStore.appendLog(jobId, "配置 MiniMax 国内 API 地址...");
+  await runCommandWithLogs(
+    "clawdbot",
+    ["config", "set", "models.providers.minimax.baseUrl", MINIMAX_CN_BASE_URL],
+    {
+      cwd: deps.repoRoot,
+      env: process.env,
+      timeoutMs,
+      onLog: (line) => deps.jobStore.appendLog(jobId, line)
+    }
+  );
+  deps.jobStore.appendLog(jobId, "配置 MiniMax 国内鉴权头...");
+  await runCommandWithLogs(
+    "clawdbot",
+    ["config", "set", "models.providers.minimax.authHeader", "true", "--json"],
+    {
+      cwd: deps.repoRoot,
+      env: process.env,
+      timeoutMs,
+      onLog: (line) => deps.jobStore.appendLog(jobId, line)
+    }
+  );
+  deps.jobStore.appendLog(jobId, "MiniMax 国内配置完成。");
 }
