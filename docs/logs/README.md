@@ -39,6 +39,7 @@
 - `docs/logs/v0.0.37-dev-docs-local-install/README.md`
 - `docs/logs/v0.0.38-reset-command/README.md`
 - `docs/logs/v0.0.39-dev-docs-reset-flow/README.md`
+- `docs/logs/v0.0.40-get-started-basic/README.md`
 
 ## 写日志的标准
 
