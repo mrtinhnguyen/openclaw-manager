@@ -7,6 +7,12 @@ ADMIN_USER="${MANAGER_ADMIN_USER:-admin}"
 ADMIN_PASS="${MANAGER_ADMIN_PASS:-pass}"
 REPO_URL="${MANAGER_REPO_URL:-https://github.com/Peiiii/moltbot-manager.git}"
 VOLUME="${MANAGER_CONFIG_VOLUME:-moltbot-manager-config}"
+GATEWAY_TIMEOUT_MS="${MANAGER_GATEWAY_TIMEOUT_MS:-}"
+
+EXTRA_ENV=()
+if [[ -n "$GATEWAY_TIMEOUT_MS" ]]; then
+  EXTRA_ENV+=("-e" "MANAGER_GATEWAY_TIMEOUT_MS=$GATEWAY_TIMEOUT_MS")
+fi
 
 docker rm -f "$NAME" 2>/dev/null || true
 docker volume create "$VOLUME" >/dev/null
@@ -18,6 +24,7 @@ docker run -d --name "$NAME" -p "${PORT}:${PORT}" \
   -e MANAGER_API_PORT="$PORT" \
   -e MANAGER_WEB_DIST=/opt/moltbot-manager/apps/web/dist \
   -e MANAGER_CONFIG_PATH=/etc/clawdbot-manager/config.json \
+  "${EXTRA_ENV[@]}" \
   -v "$VOLUME":/etc/clawdbot-manager \
   node:22-bullseye bash -lc "set -euo pipefail; \
   REPO_URL=\"$REPO_URL\"; \

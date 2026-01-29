@@ -33,7 +33,7 @@ export async function runQuickstart(
 
   let gatewayReady = false;
   let probeOk: boolean | undefined;
-  const gatewayTimeoutMs = parsePositiveInt(process.env.MANAGER_GATEWAY_TIMEOUT_MS) ?? 20_000;
+  const gatewayTimeoutMs = parsePositiveInt(process.env.MANAGER_GATEWAY_TIMEOUT_MS) ?? 60_000;
   log?.(
     `网关参数: host=${gatewayHost} port=${gatewayPort} timeout=${gatewayTimeoutMs}ms`
   );

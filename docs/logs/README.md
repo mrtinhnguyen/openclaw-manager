@@ -50,6 +50,8 @@
 - `docs/logs/v0.0.48-dev-docs-verify-section/README.md`
 - `docs/logs/v0.0.49-dev-docs-dev-vs-verify/README.md`
 - `docs/logs/v0.0.50-dev-docs-local-docker/README.md`
+- `docs/logs/v0.0.51-docker-timeout-env/README.md`
+- `docs/logs/v0.0.52-gateway-timeout-default/README.md`
 
 ## 写日志的标准
 

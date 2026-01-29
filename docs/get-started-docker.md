@@ -20,6 +20,12 @@ MANAGER_ADMIN_USER=admin MANAGER_ADMIN_PASS=pass curl -fsSL https://clawdbot-man
 MANAGER_PUBLIC_HOST=<your-public-ip-or-domain> curl -fsSL https://clawdbot-manager.pages.dev/docker.sh | bash
 ```
 
+延长网关启动超时（默认 60000ms）：
+
+```bash
+MANAGER_GATEWAY_TIMEOUT_MS=60000 curl -fsSL https://clawdbot-manager.pages.dev/docker.sh | bash
+```
+
 脚本会自动拉起容器并输出访问地址与登录信息。
 
 ## 2) 打开控制台
@@ -56,3 +62,4 @@ curl -fsS -u admin:pass http://<your-host>:17321/api/status
 - `MANAGER_API_PORT`：对外端口（默认 `17321`）
 - `MANAGER_ADMIN_USER` / `MANAGER_ADMIN_PASS`：管理员账号
 - `MANAGER_PUBLIC_HOST`：公网地址（用于打印可访问链接）
+- `MANAGER_GATEWAY_TIMEOUT_MS`：网关启动超时（毫秒）
