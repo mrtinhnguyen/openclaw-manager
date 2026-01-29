@@ -37,16 +37,20 @@ pnpm deploy:pages
 ## VPS 一键安装（脚本）
 
 ```bash
-curl -fsSL https://clawdbot-manager.pages.dev/install.sh | bash
+curl -fsSL https://clawdbot-manager.pages.dev/install.sh | MANAGER_ADMIN_USER=admin MANAGER_ADMIN_PASS=pass bash
 ```
 
 ## Docker 部署（对外文档）
 
-完整指引：`docs/docker.md`
+完整指引：[docs/docker.md](docs/docker.md)
+
+## 安装与前端使用
+
+指引：[docs/install.md](docs/install.md)
 
 ## CLI 快速验证
 
-命令清单：`docs/cli.md`
+命令清单：[docs/cli.md](docs/cli.md)
 
 ## Windows 一键安装（PowerShell）
 
@@ -73,4 +77,3 @@ irm https://clawdbot-manager.pages.dev/install.ps1 | iex
 - `apps/web`：Web 前端（React + Vite）
 - `apps/api`：本地 API 服务（Hono）
 - `packages/*`：预留扩展包（核心逻辑/共享类型/CLI）
-# moltbot-manager
