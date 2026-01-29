@@ -40,6 +40,12 @@ try {
     process.exit(0);
   }
 
+  if (cmd === "verify") {
+    const result = await runSandboxVerify({ flags, config, nonInteractive });
+    printSandboxSummary(result, { printEnv: Boolean(flags["print-env"]) });
+    process.exit(0);
+  }
+
   if (cmd === "sandbox-stop") {
     const result = stopSandbox({ flags });
     if (!result.ok) throw new Error(result.error ?? "sandbox stop failed");
@@ -508,6 +514,7 @@ Usage:
 Commands:
   status                  Show status snapshot
   sandbox                 Prepare an isolated sandbox for quick validation
+  verify                  One-shot sandbox + apply for quick validation
   sandbox-stop            Stop sandbox API process
   apply                   Run steps from a TOML config
   login                   Verify login (use --user/--pass)
@@ -533,6 +540,9 @@ Common flags:
   --gateway-port <port>   Sandbox gateway port (sandbox only)
   --no-start              Do not start API server (sandbox only)
   --print-env             Print export statements (sandbox only)
+  --no-apply              Skip apply in verify (verify only)
+  --api-entry <path>      API entry path (sandbox/verify only)
+  --no-build              Skip building API when entry missing (sandbox/verify only)
   --config-dir <path>     Service config directory (server-stop only)
   --install-dir <path>    Service install directory (server-stop only)
   --pid-file <path>       PID file path (server-stop only)
@@ -641,6 +651,50 @@ async function applyConfig(config, apiBaseUrl, authHeader, options) {
       gatewayPort: gateway.port
     });
   }
+}
+
+async function runSandboxVerify(params) {
+  const sandbox = await createSandbox(params);
+  const baseConfig = await loadTomlConfigRequired(sandbox.configPath);
+  const merged = mergeSandboxConfig(baseConfig, params.config);
+  if (merged !== baseConfig) {
+    fs.writeFileSync(sandbox.configPath, serializeToml(merged), "utf-8");
+  }
+
+  if (!sandbox.pid || params.flags["no-apply"] === true) {
+    return sandbox;
+  }
+
+  const auth = buildBasicAuth(sandbox.admin.user, sandbox.admin.pass);
+  try {
+    await applyConfig(merged, sandbox.apiBase, auth, { nonInteractive: params.nonInteractive });
+  } catch (err) {
+    const message = formatError(err);
+    if (message.includes("pairing code")) {
+      console.error(message);
+      console.error(
+        `next: MANAGER_API_URL="${sandbox.apiBase}" MANAGER_AUTH_USER="${sandbox.admin.user}" MANAGER_AUTH_PASS="${sandbox.admin.pass}" pnpm manager:pairing-approve -- --code "<PAIRING_CODE>" --continue`
+      );
+      return sandbox;
+    }
+    throw err;
+  }
+  return sandbox;
+}
+
+function mergeSandboxConfig(base, extra) {
+  if (!extra || typeof extra !== "object") return base;
+  const merged = { ...extra };
+  merged.api = base.api;
+  merged.admin = base.admin;
+  merged.gateway = base.gateway;
+  if (base.install || extra.install) {
+    merged.install = { ...base.install, ...extra.install };
+  }
+  if (extra.discord) merged.discord = extra.discord;
+  if (extra.ai) merged.ai = extra.ai;
+  if (extra.pairing) merged.pairing = extra.pairing;
+  return merged;
 }
 
 async function createSandbox(params) {
@@ -857,6 +911,61 @@ function renderSandboxToml(params) {
     `cli = true`,
     ``
   ].join("\n");
+}
+
+function serializeToml(config) {
+  const lines = [];
+  const knownSections = new Set([
+    "api",
+    "admin",
+    "install",
+    "discord",
+    "ai",
+    "gateway",
+    "pairing"
+  ]);
+  for (const [key, value] of Object.entries(config ?? {})) {
+    if (knownSections.has(key)) continue;
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      continue;
+    }
+    lines.push(`${key} = ${formatTomlValue(value)}`);
+  }
+  if (lines.length) lines.push("");
+  const writeSection = (name, obj) => {
+    if (!obj || typeof obj !== "object") return;
+    lines.push(`[${name}]`);
+    for (const [key, value] of Object.entries(obj)) {
+      lines.push(`${key} = ${formatTomlValue(value)}`);
+    }
+    lines.push("");
+  };
+  writeSection("api", config.api);
+  writeSection("admin", config.admin);
+  writeSection("install", config.install);
+  writeSection("discord", config.discord);
+  writeSection("ai", config.ai);
+  writeSection("gateway", config.gateway);
+  writeSection("pairing", config.pairing);
+  for (const [key, value] of Object.entries(config ?? {})) {
+    if (knownSections.has(key)) continue;
+    if (!value || typeof value !== "object" || Array.isArray(value)) continue;
+    writeSection(key, value);
+  }
+  return lines.join("\n").trim() + "\n";
+}
+
+function formatTomlValue(value) {
+  if (Array.isArray(value)) {
+    return `[${value.map(formatTomlValue).join(", ")}]`;
+  }
+  if (typeof value === "string") {
+    return `"${value.replace(/"/g, '\\"')}"`;
+  }
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+  return "\"\"";
 }
 
 async function resolveAvailablePort(start, avoid = []) {

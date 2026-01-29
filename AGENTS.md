@@ -16,6 +16,14 @@
 ---
 不急，接下来我们采取一种面向未来的逆天超级快节奏的开发方式。
 
+## Commands Index
+
+- `/new-command`
+- `/config-meta`
+- `/commit`
+- `/validate`
+- `/closed-loop`
+
 
 ## 迭代制度（docs/logs）
 
@@ -54,4 +62,5 @@
 - **use-chinese-when-communicating**：与用户交流时使用中文。
 - **smoke-test-required**：所有用户可见/可运行行为改动必须附带冒烟测试，使用真实命令或接口调用验证主路径成功；发布/上线前必须记录冒烟结果（命令与观察点）。执行方式：按组件选择对应 CLI/API/UI 最小可行流程；责任人：当次交付 owner。
 - **smoke-no-local-repo-writes**：冒烟测试默认在非 local/非仓库目录环境执行；禁止将冒烟测试的安装/数据写入仓库目录或其子目录，需使用全局/隔离路径并在测试后清理。执行方式：优先 global scope 或临时目录；责任人：当次交付 owner。
+- **iteration-log-usage-verification-required**：迭代日志必须包含功能使用说明与验证方法说明。执行方式：在每个 `docs/logs/v*/README.md` 增加“使用方式/验证方式”或等价章节；责任人：当次交付 owner。
 - **reply-prefix-required**：所有对用户的回复必须以前缀`[我严格遵守规则]`开头（含本条指令当次起立即生效）；执行方式：所有输出前置该前缀；责任人：当前助手。

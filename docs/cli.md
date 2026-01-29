@@ -71,6 +71,12 @@ pnpm manager:sandbox -- --print-env
 pnpm manager:sandbox-stop -- --dir "/tmp/clawdbot-manager-sandbox-<timestamp>"
 ```
 
+### 方案 D：一键隔离验证
+
+```bash
+pnpm manager:verify
+```
+
 ## 完整示例流程
 
 下面是一个从零到验证完成的完整顺序示例（包含配对步骤）。将示例中的占位值替换为你的真实配置，并保存为 `manager.toml`。
@@ -146,6 +152,11 @@ pnpm manager:pairing-approve -- --code "ABCDE123" --continue
 查看状态：
 ```bash
 pnpm manager:status
+```
+
+一键隔离验证：
+```bash
+pnpm manager:verify
 ```
 
 创建隔离沙盒（快速验证）：

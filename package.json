@@ -14,6 +14,7 @@
     "manager:cli": "node scripts/manager-cli.mjs",
     "manager:status": "node scripts/manager-cli.mjs status",
     "manager:sandbox": "node scripts/manager-cli.mjs sandbox",
+    "manager:verify": "node scripts/manager-cli.mjs verify",
     "manager:sandbox-stop": "node scripts/manager-cli.mjs sandbox-stop",
     "manager:apply": "node scripts/manager-cli.mjs apply",
     "manager:login": "node scripts/manager-cli.mjs login",
