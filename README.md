@@ -5,12 +5,12 @@
 
 **Mac / Linux**
 ```bash
-curl -fsSL https://clawdbot-manager.pages.dev/install.sh | bash
+curl -fsSL https://claw.cool/install.sh | bash
 ```
 
 **Windows**（暂未验证过，请谨慎使用）
 ```powershell
-irm https://clawdbot-manager.pages.dev/install.ps1 | iex
+irm https://claw.cool/install.ps1 | iex
 ```
 
 ### 使用 Manager 安装 OpenClaw
