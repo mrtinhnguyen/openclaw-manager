@@ -8,7 +8,7 @@
 curl -fsSL https://clawdbot-manager.pages.dev/install.sh | bash
 ```
 
-**Windows**
+**Windows**（暂未验证过，请谨慎使用）
 ```powershell
 irm https://clawdbot-manager.pages.dev/install.ps1 | iex
 ```
