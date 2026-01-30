@@ -1,6 +1,8 @@
 # OpenClaw Manager(Clawdbot Manager)
 ## OpenClaw(Clawdbot) 安装与配置工具
 
+![Clawdbot Manager 截图](images/screenshots/clawdbot-manger.png)
+
 ### 安装 Manager
 
 **Mac / Linux**
