@@ -68,6 +68,7 @@
 - `docs/logs/v0.0.66-readme-clawdbot-compat/README.md`
 - `docs/logs/v0.0.67-cli-core/README.md`
 - `docs/logs/v0.0.68-oranize-meta/README.md`
+- `docs/logs/v0.0.69-readme-install-structure/README.md`
 
 ## 写日志的标准
 

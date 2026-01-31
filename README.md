@@ -5,13 +5,7 @@
 
 ### 安装 Manager
 
-**Mac / Linux**
-```bash
-curl -fsSL https://openclaw-manager.com/install.sh | bash
-```
-安装过程中会提示设置管理员用户名和密码。
-
-**NPM（推荐）**
+#### 方式 A：NPM（推荐）
 ```bash
 npm i -g openclaw-manager
 openclaw-manager start
@@ -24,6 +18,14 @@ openclaw-manager start
 ```bash
 openclaw-manager start --user admin --password pass
 ```
+
+#### 方式 B：脚本安装
+
+**Mac / Linux**
+```bash
+curl -fsSL https://openclaw-manager.com/install.sh | bash
+```
+安装过程中会提示设置管理员用户名和密码。
 
 **Windows**（暂未验证过，请谨慎使用）
 ```powershell
