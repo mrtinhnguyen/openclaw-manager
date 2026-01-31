@@ -22,6 +22,7 @@
 
 - `/new-command`
 - `/config-meta`
+- `/oranize-meta`
 - `/commit`
 - `/validate`
 - `/closed-loop`
