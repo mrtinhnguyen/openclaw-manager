@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import type { CommandEntry, ProcessEntry } from "@/store/status-store";
+import type { CommandEntry, ProcessEntry } from "@/stores/status-store";
 
 export function CommandCard({
   command,

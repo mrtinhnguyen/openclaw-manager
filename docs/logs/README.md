@@ -56,6 +56,8 @@
 - `docs/logs/v0.0.54-install-node-auto-public-url/README.md`
 - `docs/logs/v0.0.55-onboarding-ui-refactor/README.md`
 - `docs/logs/v0.0.56-onboarding-hook-split/README.md`
+- `docs/logs/v0.0.57-mvp-presenter/README.md`
+- `docs/logs/v0.0.58-onboarding-orchestrator/README.md`
 
 ## 写日志的标准
 

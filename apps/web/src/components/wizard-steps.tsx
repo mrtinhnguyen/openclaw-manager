@@ -4,7 +4,7 @@ import { JobLogPanel } from "@/components/job-log-panel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import type { JobStatus } from "@/store/jobs-store";
+import type { JobStatus } from "@/stores/jobs-store";
 
 // ============================================
 // Auth Step

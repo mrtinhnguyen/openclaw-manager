@@ -1,4 +1,4 @@
-import type { StatusResponse } from "@/store/status-store";
+import type { StatusResponse } from "@/stores/status-store";
 
 import type { OnboardingDerived } from "./onboarding-types";
 

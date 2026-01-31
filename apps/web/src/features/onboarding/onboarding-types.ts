@@ -1,5 +1,4 @@
-import type { WizardStep } from "@/components/wizard-sidebar";
-import type { JobState, QuickstartResult } from "@/store/jobs-store";
+import type { JobState, QuickstartResult } from "@/stores/jobs-store";
 
 export type OnboardingInputs = {
   tokenInput: string;
@@ -10,14 +9,6 @@ export type OnboardingInputs = {
   authPass: string;
 };
 
-export type OnboardingInputSetters = {
-  setTokenInput: (value: string) => void;
-  setAiProvider: (value: string) => void;
-  setAiKeyInput: (value: string) => void;
-  setPairingInput: (value: string) => void;
-  setAuthUser: (value: string) => void;
-  setAuthPass: (value: string) => void;
-};
 
 export type OnboardingMessages = {
   authMessage: string | null;
@@ -28,14 +19,6 @@ export type OnboardingMessages = {
   resourceMessage: string | null;
 };
 
-export type OnboardingMessageSetters = {
-  setAuthMessage: (value: string | null) => void;
-  setMessage: (value: string | null) => void;
-  setAiMessage: (value: string | null) => void;
-  setCliMessage: (value: string | null) => void;
-  setProbeMessage: (value: string | null) => void;
-  setResourceMessage: (value: string | null) => void;
-};
 
 export type OnboardingDerived = {
   cliInstalled: boolean;
@@ -68,23 +51,4 @@ export type OnboardingActions = {
   handleRetry: () => Promise<void>;
   handleProbe: () => Promise<void>;
   handleResourceDownload: () => Promise<{ ok: boolean; error?: string }>;
-};
-
-export type OnboardingViewModel = {
-  state: {
-    currentStep: WizardStep;
-    isConnected: boolean;
-    error: string | null;
-    authRequired: boolean;
-    authConfigured: boolean;
-    inputs: OnboardingInputs;
-    messages: OnboardingMessages;
-    derived: OnboardingDerived;
-    jobs: OnboardingJobs;
-    isProcessing: boolean;
-    autoStarted: boolean;
-  };
-  actions: {
-    setInputs: OnboardingInputSetters;
-  } & OnboardingActions;
 };
