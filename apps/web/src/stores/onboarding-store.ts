@@ -8,12 +8,9 @@ export type OnboardingInputs = {
   aiProvider: string;
   aiKeyInput: string;
   pairingInput: string;
-  authUser: string;
-  authPass: string;
 };
 
 export type OnboardingMessages = {
-  authMessage: string | null;
   message: string | null;
   aiMessage: string | null;
   cliMessage: string | null;
@@ -42,9 +39,6 @@ type OnboardingState = {
   setAiProvider: (value: string) => void;
   setAiKeyInput: (value: string) => void;
   setPairingInput: (value: string) => void;
-  setAuthUser: (value: string) => void;
-  setAuthPass: (value: string) => void;
-  setAuthMessage: (value: string | null) => void;
   setMessage: (value: string | null) => void;
   setAiMessage: (value: string | null) => void;
   setCliMessage: (value: string | null) => void;
@@ -58,13 +52,10 @@ const initialInputs: OnboardingInputs = {
   tokenInput: "",
   aiProvider: "anthropic",
   aiKeyInput: "",
-  pairingInput: "",
-  authUser: "",
-  authPass: ""
+  pairingInput: ""
 };
 
 const initialMessages: OnboardingMessages = {
-  authMessage: null,
   message: null,
   aiMessage: null,
   cliMessage: null,
@@ -73,8 +64,8 @@ const initialMessages: OnboardingMessages = {
 };
 
 export const useOnboardingStore = create<OnboardingState>((set) => ({
-  currentStep: "auth",
-  systemStep: "auth",
+  currentStep: "cli",
+  systemStep: "cli",
   pendingStep: null,
   pendingSince: null,
   blockingReason: null,
@@ -98,12 +89,6 @@ export const useOnboardingStore = create<OnboardingState>((set) => ({
     set((state) => ({ inputs: { ...state.inputs, aiKeyInput: value } })),
   setPairingInput: (value) =>
     set((state) => ({ inputs: { ...state.inputs, pairingInput: value } })),
-  setAuthUser: (value) =>
-    set((state) => ({ inputs: { ...state.inputs, authUser: value } })),
-  setAuthPass: (value) =>
-    set((state) => ({ inputs: { ...state.inputs, authPass: value } })),
-  setAuthMessage: (value) =>
-    set((state) => ({ messages: { ...state.messages, authMessage: value } })),
   setMessage: (value) =>
     set((state) => ({ messages: { ...state.messages, message: value } })),
   setAiMessage: (value) =>

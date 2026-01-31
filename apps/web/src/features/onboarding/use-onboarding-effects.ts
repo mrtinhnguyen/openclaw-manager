@@ -14,18 +14,10 @@ export function useStatusPolling(refresh: () => Promise<void>, jobsRunning: bool
   }, [refresh, jobsRunning]);
 }
 
-export function useAuthCheck(checkAuth: () => Promise<void>) {
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
-}
-
 type AutoStartParams = {
   autoStarted: boolean;
   hasStatus: boolean;
   cliInstalled: boolean;
-  authRequired: boolean;
-  authHeader: string | null;
   quickstartRunning: boolean;
   gatewayOk: boolean;
   startQuickstartJob: (opts: { runProbe?: boolean; startGateway?: boolean }) => Promise<{
@@ -42,8 +34,6 @@ export function useAutoStartGateway(params: AutoStartParams) {
     autoStarted,
     hasStatus,
     cliInstalled,
-    authRequired,
-    authHeader,
     quickstartRunning,
     gatewayOk,
     startQuickstartJob,
@@ -56,7 +46,6 @@ export function useAutoStartGateway(params: AutoStartParams) {
       autoStarted ||
       !hasStatus ||
       !cliInstalled ||
-      (authRequired && !authHeader) ||
       quickstartRunning
     ) {
       return;
@@ -82,8 +71,6 @@ export function useAutoStartGateway(params: AutoStartParams) {
     autoStarted,
     hasStatus,
     cliInstalled,
-    authRequired,
-    authHeader,
     quickstartRunning,
     gatewayOk,
     setMessage,
@@ -106,8 +93,6 @@ export function useOnboardingFlow(params: OnboardingFlowParams) {
     onStatusUpdate(context);
   }, [
     hasStatus,
-    context.authRequired,
-    context.authHeader,
     context.cliInstalled,
     context.gatewayOk,
     context.tokenConfigured,
@@ -120,8 +105,6 @@ export function useOnboardingFlow(params: OnboardingFlowParams) {
 
 type EnterSubmitParams = {
   currentStep: OnboardingStep;
-  authRequired: boolean;
-  authHeader: string | null;
   cliInstalled: boolean;
   tokenInput: string;
   aiKeyInput: string;
@@ -133,8 +116,6 @@ type EnterSubmitParams = {
 export function useEnterKeySubmit(params: EnterSubmitParams) {
   const {
     currentStep,
-    authRequired,
-    authHeader,
     cliInstalled,
     tokenInput,
     aiKeyInput,
@@ -146,9 +127,7 @@ export function useEnterKeySubmit(params: EnterSubmitParams) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Enter" && !e.shiftKey && !isProcessing) {
-        if (currentStep === "auth" && authRequired && !authHeader) {
-          actions.handleAuthSubmit();
-        } else if (currentStep === "cli" && !cliInstalled) {
+        if (currentStep === "cli" && !cliInstalled) {
           actions.handleCliInstall();
         } else if (currentStep === "token" && tokenInput.trim()) {
           actions.handleTokenSubmit();
@@ -165,8 +144,6 @@ export function useEnterKeySubmit(params: EnterSubmitParams) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [
     currentStep,
-    authRequired,
-    authHeader,
     cliInstalled,
     tokenInput,
     aiKeyInput,

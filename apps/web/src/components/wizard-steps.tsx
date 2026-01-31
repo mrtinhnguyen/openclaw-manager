@@ -18,7 +18,6 @@ interface AuthStepProps {
     onSubmit: () => void;
     isProcessing: boolean;
     message: string | null;
-    configured: boolean;
 }
 
 export function AuthStep({
@@ -28,8 +27,7 @@ export function AuthStep({
     onPasswordChange,
     onSubmit,
     isProcessing,
-    message,
-    configured
+    message
 }: AuthStepProps) {
     return (
         <div className="space-y-6 p-8">
@@ -42,11 +40,6 @@ export function AuthStep({
                     请输入安装时设置的管理员用户名与密码
                 </p>
             </div>
-            {!configured ? (
-                <div className="rounded-2xl bg-warning/10 px-4 py-2 text-sm text-warning text-center">
-                    未检测到管理员配置，请先运行安装脚本完成初始化。
-                </div>
-            ) : null}
             <div className="space-y-4">
                 <Input
                     value={username}
@@ -62,7 +55,7 @@ export function AuthStep({
                 />
                 <Button
                     onClick={onSubmit}
-                    disabled={!username.trim() || !password || isProcessing || !configured}
+                    disabled={!username.trim() || !password || isProcessing}
                     size="lg"
                     className="w-full"
                 >

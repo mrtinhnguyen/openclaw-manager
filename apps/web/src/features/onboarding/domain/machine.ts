@@ -18,8 +18,6 @@ export function syncOnboardingFlow(
   context: OnboardingContext
 ): OnboardingFlowState {
   const systemStep = resolveNextStep({
-    authRequired: context.authRequired,
-    authHeader: context.authHeader,
     cliInstalled: context.cliInstalled,
     gatewayOk: context.gatewayOk,
     tokenConfigured: context.tokenConfigured,
@@ -100,8 +98,6 @@ function resolveBlockingReason(params: {
 
 export function isStepSatisfied(context: OnboardingContext, step: OnboardingStep): boolean {
   switch (step) {
-    case "auth":
-      return !context.authRequired || Boolean(context.authHeader);
     case "cli":
       return context.cliInstalled;
     case "gateway":

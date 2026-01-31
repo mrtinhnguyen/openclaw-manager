@@ -1,9 +1,6 @@
 import type { StatusResponse } from "@/stores/status-store";
 
 export type OnboardingContext = {
-  authRequired: boolean;
-  authHeader: string | null;
-  authConfigured: boolean;
   cliInstalled: boolean;
   cliVersion: string | null;
   cliChecking: boolean;
@@ -20,15 +17,9 @@ export type OnboardingContext = {
 export function deriveOnboardingContext(params: {
   status: StatusResponse | null;
   loading: boolean;
-  authRequired: boolean;
-  authHeader: string | null;
-  authConfigured: boolean;
 }): OnboardingContext {
-  const { status, loading, authRequired, authHeader, authConfigured } = params;
+  const { status, loading } = params;
   return {
-    authRequired,
-    authHeader,
-    authConfigured,
     cliInstalled: Boolean(status?.cli.installed),
     cliVersion: status?.cli.version ?? null,
     gatewayOk: Boolean(status?.gateway.ok),

@@ -98,7 +98,7 @@ export const useStatusStore = create<StatusState>((set, get) => ({
       });
       if (res.status === 401) {
         config.setAuthHeader(null);
-        config.setAuthState(true, false);
+        config.setAuthState(true);
         set({ loading: false, error: "需要登录" });
         await config.checkAuth();
         return;

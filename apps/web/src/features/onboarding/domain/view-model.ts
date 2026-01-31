@@ -20,13 +20,6 @@ export type OnboardingViewModel = {
   pendingSince: string | null;
   blockingReason: OnboardingBlockingReason | null;
   jobsRunning: boolean;
-  auth: {
-    username: string;
-    password: string;
-    isProcessing: boolean;
-    message: string | null;
-    configured: boolean;
-  };
   cli: {
     installed: boolean;
     version: string | null;
@@ -118,13 +111,6 @@ export function buildOnboardingViewModel(params: {
     pendingSince: state.pendingSince,
     blockingReason: state.blockingReason,
     jobsRunning,
-    auth: {
-      username: state.inputs.authUser,
-      password: state.inputs.authPass,
-      isProcessing: state.isProcessing,
-      message: state.messages.authMessage,
-      configured: context.authConfigured
-    },
     cli: {
       installed: context.cliInstalled,
       version: context.cliVersion,

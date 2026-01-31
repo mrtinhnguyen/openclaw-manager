@@ -10,12 +10,11 @@ export type ConfigState = {
   gatewayPort: string;
   authHeader: string | null;
   authRequired: boolean;
-  authConfigured: boolean;
   setApiBase: (value: string) => void;
   setGatewayHost: (value: string) => void;
   setGatewayPort: (value: string) => void;
   setAuthHeader: (value: string | null) => void;
-  setAuthState: (required: boolean, configured: boolean) => void;
+  setAuthState: (required: boolean) => void;
   clearAuth: () => void;
   checkAuth: () => Promise<void>;
   login: (username: string, password: string) => Promise<{ ok: boolean; error?: string }>
@@ -29,28 +28,24 @@ export const useConfigStore = create<ConfigState>()(
       gatewayPort: "18789",
       authHeader: null,
       authRequired: false,
-      authConfigured: false,
       setApiBase: (value) => set({ apiBase: normalizeBase(value) }),
       setGatewayHost: (value) => set({ gatewayHost: value.trim() }),
       setGatewayPort: (value) => set({ gatewayPort: value.trim() }),
       setAuthHeader: (value) => set({ authHeader: value }),
-      setAuthState: (required, configured) =>
-        set({ authRequired: required, authConfigured: configured }),
-      clearAuth: () => set({ authHeader: null, authRequired: false, authConfigured: false }),
+      setAuthState: (required) => set({ authRequired: required }),
+      clearAuth: () => set({ authHeader: null, authRequired: false }),
       checkAuth: async () => {
         const { apiBase } = get();
         try {
           const res = await fetch(`${apiBase}/api/auth/status`);
           if (!res.ok) throw new Error(`Auth status failed: ${res.status}`);
-          const data = (await res.json()) as { required?: boolean; configured?: boolean };
+          const data = (await res.json()) as { required?: boolean };
           set({
-            authRequired: Boolean(data.required),
-            authConfigured: Boolean(data.configured)
+            authRequired: Boolean(data.required)
           });
         } catch (err) {
           set({
-            authRequired: true,
-            authConfigured: false
+            authRequired: true
           });
         }
       },
@@ -65,7 +60,7 @@ export const useConfigStore = create<ConfigState>()(
           const data = (await res.json()) as { ok: boolean; error?: string };
           if (!data.ok) return data;
           const authHeader = buildBasicAuth(username, password);
-          set({ authHeader, authRequired: true, authConfigured: true });
+          set({ authHeader, authRequired: true });
           await get().checkAuth();
           return { ok: true };
         } catch (err) {

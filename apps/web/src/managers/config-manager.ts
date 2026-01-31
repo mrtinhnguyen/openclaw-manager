@@ -5,8 +5,7 @@ export class ConfigManager {
   setGatewayHost = (value: string) => useConfigStore.getState().setGatewayHost(value);
   setGatewayPort = (value: string) => useConfigStore.getState().setGatewayPort(value);
   setAuthHeader = (value: string | null) => useConfigStore.getState().setAuthHeader(value);
-  setAuthState = (required: boolean, configured: boolean) =>
-    useConfigStore.getState().setAuthState(required, configured);
+  setAuthState = (required: boolean) => useConfigStore.getState().setAuthState(required);
   clearAuth = () => useConfigStore.getState().clearAuth();
   checkAuth = async () => useConfigStore.getState().checkAuth();
   login = async (username: string, password: string) =>

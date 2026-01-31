@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 
-import { useConfigStore } from "@/stores/config-store";
 import { useJobsStore } from "@/stores/jobs-store";
 import { useOnboardingStore } from "@/stores/onboarding-store";
 import { useStatusStore } from "@/stores/status-store";
@@ -11,9 +10,6 @@ import { buildOnboardingViewModel } from "./domain/view-model";
 export function useOnboardingViewModel() {
   const status = useStatusStore((state) => state.status);
   const loading = useStatusStore((state) => state.loading);
-  const authRequired = useConfigStore((state) => state.authRequired);
-  const authHeader = useConfigStore((state) => state.authHeader);
-  const authConfigured = useConfigStore((state) => state.authConfigured);
 
   const currentStep = useOnboardingStore((store) => store.currentStep);
   const systemStep = useOnboardingStore((store) => store.systemStep);
@@ -35,12 +31,9 @@ export function useOnboardingViewModel() {
     () =>
       deriveOnboardingContext({
         status,
-        loading,
-        authRequired,
-        authHeader,
-        authConfigured
+        loading
       }),
-    [status, loading, authRequired, authHeader, authConfigured]
+    [status, loading]
   );
 
   const viewModel = useMemo(

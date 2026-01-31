@@ -1,5 +1,4 @@
 export type OnboardingStep =
-  | "auth"
   | "cli"
   | "gateway"
   | "token"
@@ -9,7 +8,6 @@ export type OnboardingStep =
   | "complete";
 
 export const ONBOARDING_STEPS = [
-  { id: "auth", label: "管理员登录", description: "保护控制台访问" },
   { id: "cli", label: "安装 CLI", description: "准备运行环境" },
   { id: "gateway", label: "启动网关", description: "自动启动本地服务" },
   { id: "token", label: "配置 Token", description: "连接 Discord Bot" },
@@ -35,8 +33,6 @@ export function getOnboardingStepMeta(step: OnboardingStep) {
 }
 
 export function resolveNextStep(params: {
-  authRequired: boolean;
-  authHeader: string | null;
   cliInstalled: boolean;
   gatewayOk: boolean;
   tokenConfigured: boolean;
@@ -45,8 +41,6 @@ export function resolveNextStep(params: {
   probeOk: boolean;
 }): OnboardingStep {
   const {
-    authRequired,
-    authHeader,
     cliInstalled,
     gatewayOk,
     tokenConfigured,
@@ -54,7 +48,6 @@ export function resolveNextStep(params: {
     allowFromConfigured,
     probeOk
   } = params;
-  if (authRequired && !authHeader) return "auth";
   if (!cliInstalled) return "cli";
   if (probeOk) return "complete";
   if (gatewayOk && tokenConfigured && !aiConfigured) return "ai";

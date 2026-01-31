@@ -5,7 +5,6 @@ import {
   type OnboardingFlowState
 } from "@/features/onboarding/domain/machine";
 import type { OnboardingStep } from "@/features/onboarding/onboarding-steps";
-import { useConfigStore } from "@/stores/config-store";
 import { useJobsStore } from "@/stores/jobs-store";
 import { useOnboardingStore } from "@/stores/onboarding-store";
 import { useStatusStore } from "@/stores/status-store";
@@ -15,9 +14,6 @@ export class OnboardingManager {
   setAiProvider = (value: string) => useOnboardingStore.getState().setAiProvider(value);
   setAiKeyInput = (value: string) => useOnboardingStore.getState().setAiKeyInput(value);
   setPairingInput = (value: string) => useOnboardingStore.getState().setPairingInput(value);
-  setAuthUser = (value: string) => useOnboardingStore.getState().setAuthUser(value);
-  setAuthPass = (value: string) => useOnboardingStore.getState().setAuthPass(value);
-  setAuthMessage = (value: string | null) => useOnboardingStore.getState().setAuthMessage(value);
   setMessage = (value: string | null) => useOnboardingStore.getState().setMessage(value);
   setAiMessage = (value: string | null) => useOnboardingStore.getState().setAiMessage(value);
   setCliMessage = (value: string | null) => useOnboardingStore.getState().setCliMessage(value);
@@ -35,24 +31,6 @@ export class OnboardingManager {
     if (previousPending && !nextFlow.pendingStep) {
       clearPendingMessages(previousPending, onboarding);
     }
-  };
-
-  handleAuthSubmit = async () => {
-    const onboarding = useOnboardingStore.getState();
-    const { authUser, authPass } = onboarding.inputs;
-    if (!authUser.trim() || !authPass.trim()) return;
-
-    onboarding.setIsProcessing(true);
-    onboarding.setAuthMessage(null);
-    const result = await useConfigStore.getState().login(authUser, authPass);
-    if (result.ok) {
-      onboarding.setAuthMessage("登录成功，正在加载配置...");
-      onboarding.setAuthPass("");
-      await useStatusStore.getState().refresh();
-    } else {
-      onboarding.setAuthMessage(`登录失败: ${result.error}`);
-    }
-    onboarding.setIsProcessing(false);
   };
 
   handleCliInstall = async () => {

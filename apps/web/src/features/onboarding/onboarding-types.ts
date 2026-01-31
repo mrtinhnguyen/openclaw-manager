@@ -1,5 +1,4 @@
 export type OnboardingActions = {
-  handleAuthSubmit: () => Promise<void>;
   handleCliInstall: () => Promise<void>;
   handleTokenSubmit: () => Promise<void>;
   handleAiSubmit: () => Promise<void>;
