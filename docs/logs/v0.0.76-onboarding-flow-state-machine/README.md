@@ -35,6 +35,9 @@ curl -fsS https://openclaw-manager.com/ > /dev/null
 pnpm deploy:pages
 ```
 
+npm 发布（已完成）：
+- 发布版本：`openclaw-manager@0.1.6`
+
 线上验收：
 - `curl -fsS https://openclaw-manager.com/ > /dev/null`
 

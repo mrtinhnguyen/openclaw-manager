@@ -80,6 +80,7 @@
 - **npm-release-counts-as-deploy**：npm 包发布属于“发布/上线”，必须遵守完整闭环（migrations apply -> deploy -> 线上冒烟验证），并按 `docs/workflows/npm-release-process.md` 执行。执行方式：发布阶段必须记录 npm 发布与线上冒烟结果；责任人：当次交付 owner。
 - **no-repeat-publish-ask-after-confirmation**：用户已明确要求闭环/发布后，不得再次询问是否发布，必须直接执行完整发布闭环并回报结果。执行方式：收到确认后视为授权持续有效，直到本次交付完成；责任人：当前助手。
 - **cli-change-requires-npm-release**：涉及 `packages/cli` 或 CLI 行为变更，默认必须执行 npm 发布闭环（含版本号提升与发布）。执行方式：变更完成后自动进入 npm 发布流程；责任人：当次交付 owner。
+- **web-ui-change-requires-npm-release**：只要影响 CLI 内置 Web UI（`apps/web` 或 `packages/cli/web-dist`），必须同步执行 npm 发布闭环（含版本号提升与发布），以确保 CLI 内置 UI 与线上一致。执行方式：变更完成后自动进入 npm 发布流程；责任人：当次交付 owner。
 - **npm-release-fallback-2fa**：npm 发布失败需自动尝试 `.npmrc.publish.local` 或 `NPM_TOKEN`，若仍失败且错误含 2FA/权限，必须明确提示需要 2FA bypass token 并停止等待。执行方式：发布失败时输出错误原因与下一步；责任人：当次交付 owner。
 
 ## 文档与迭代
