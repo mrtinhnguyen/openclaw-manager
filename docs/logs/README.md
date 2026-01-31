@@ -59,6 +59,7 @@
 - `docs/logs/v0.0.57-mvp-presenter/README.md`
 - `docs/logs/v0.0.58-onboarding-orchestrator/README.md`
 - `docs/logs/v0.0.59-windows-install-log/README.md`
+- `docs/logs/v0.0.60-windows-install-lightweight/README.md`
 
 ## 写日志的标准
 

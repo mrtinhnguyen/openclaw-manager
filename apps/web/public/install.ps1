@@ -22,20 +22,27 @@ function Require-Command {
 }
 
 Require-Command -Name "git"
-Require-Command -Name "node" -Hint "[manager] Node.js >= 22 is required."
+Require-Command -Name "node" -Hint "[manager] Node.js is required."
 
 if (-not (Get-Command "pnpm" -ErrorAction SilentlyContinue)) {
   if (Get-Command "corepack" -ErrorAction SilentlyContinue) {
     corepack enable | Out-Null
     corepack prepare pnpm@10.23.0 --activate | Out-Null
   } else {
-    Write-Error "[manager] pnpm is required (install via corepack)."
+    Write-Error "[manager] pnpm is required. Install via: npm i -g pnpm"
     exit 1
   }
 }
 
 $installDir = if ($env:MANAGER_INSTALL_DIR) { $env:MANAGER_INSTALL_DIR } else { Join-Path $env:USERPROFILE "clawdbot-manager" }
 $configDir = if ($env:MANAGER_CONFIG_DIR) { $env:MANAGER_CONFIG_DIR } else { Join-Path $env:USERPROFILE ".clawdbot-manager" }
+
+if (Test-Path $installDir) {
+  if (-not (Test-Path (Join-Path $installDir ".git"))) {
+    Write-Error "[manager] Install dir exists and is not a git repo: $installDir. Please choose an empty directory or remove it, then retry."
+    exit 1
+  }
+}
 
 if (Test-Path (Join-Path $installDir ".git")) {
   Write-Host "[manager] Updating $installDir"
