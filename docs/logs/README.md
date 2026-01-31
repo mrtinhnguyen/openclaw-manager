@@ -66,6 +66,7 @@
 - `docs/logs/v0.0.64-repo-domain-rename/README.md`
 - `docs/logs/v0.0.65-brand-unify/README.md`
 - `docs/logs/v0.0.66-readme-clawdbot-compat/README.md`
+- `docs/logs/v0.0.67-cli-core/README.md`
 
 ## 写日志的标准
 

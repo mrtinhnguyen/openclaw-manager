@@ -16,6 +16,14 @@ curl -fsSL https://openclaw-manager.com/install.sh | bash
 npm i -g openclaw-manager
 openclaw-manager start
 ```
+常用命令：
+- `openclaw-manager stop`
+- `openclaw-manager stop-all`
+
+首次启动可显式指定账号密码：
+```bash
+openclaw-manager start --user admin --password pass
+```
 
 **Windows**（暂未验证过，请谨慎使用）
 ```powershell

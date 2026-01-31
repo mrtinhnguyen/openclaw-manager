@@ -7,6 +7,7 @@
 7. 若用户明确要求“直接发布/不做选择”，默认执行全量发布闭环（覆盖所有本次变更涉及的组件），不得再次要求用户决策
 8. NPM 包发布流程详见 `docs/workflows/npm-release-process.md`，必须遵循
 9. 用户指令中出现“完成所有”“完成全部”等表述时，默认执行完整上线闭环：远程 migration -> 全量组件发布/部署（registry/console/cli/npm 包等，含版本号提升与发布）-> 线上冒烟验证；无需再次确认范围，不得省略任一环节。
+10. NPM 包发布视为“发布/上线”，必须纳入发布闭环与线上冒烟验证。
 
 ---
 负面清单
@@ -69,3 +70,4 @@
 - **proactive-adjustment-on-request**：用户提出需求时需判断是否应主动调整相关内容并执行；如判断需要，直接推进并说明；如不需要，明确说明理由与不做的范围。执行方式：回复中包含“是否需要调整”的判断与行动；责任人：当前助手。
 - **user-intent-analysis-required**：每次用户消息需尝试分析深层诉求并给出能减少沟通成本的回应方式（例如先给推荐路径或最短可行方案）。执行方式：回复中包含“深层诉求”的判断与“降低沟通成本”的行动说明；责任人：当前助手。
 - **auto-deploy-pages-by-default**：用户要求变更后，默认执行 `pnpm deploy:pages` 完成 Pages 部署并做线上冒烟验证；除非用户明确要求不部署或部署受阻（如缺少 `CLOUDFLARE_API_TOKEN`）。执行方式：变更完成后自动部署并回报结果；责任人：当前助手。
+- **npm-release-counts-as-deploy**：npm 包发布属于“发布/上线”，必须遵守完整闭环（migrations apply -> deploy -> 线上冒烟验证），并按 `docs/workflows/npm-release-process.md` 执行。执行方式：发布阶段必须记录 npm 发布与线上冒烟结果；责任人：当次交付 owner。
