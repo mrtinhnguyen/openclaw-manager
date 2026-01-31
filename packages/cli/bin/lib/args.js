@@ -11,7 +11,13 @@ const longKeyMap = {
     "config-path": "configPath",
     "log-path": "logPath",
     "error-log-path": "errorLogPath",
-    "non-interactive": "nonInteractive"
+    "non-interactive": "nonInteractive",
+    "dry-run": "dryRun",
+    "keep-clawdbot": "keepClawdbot",
+    "no-stop": "noStop",
+    force: "force",
+    "install-dir": "installDir",
+    "clawdbot-dir": "clawdbotDir"
 };
 const shortKeyMap = {
     h: "help",
@@ -32,7 +38,13 @@ export function parseArgs(argv) {
         if (arg.startsWith("--")) {
             const [rawKey, inlineValue] = arg.slice(2).split("=");
             const key = longKeyMap[rawKey] ?? rawKey;
-            if (key === "help" || key === "version" || key === "nonInteractive") {
+            if (key === "help" ||
+                key === "version" ||
+                key === "nonInteractive" ||
+                key === "dryRun" ||
+                key === "keepClawdbot" ||
+                key === "noStop" ||
+                key === "force") {
                 flags[key] = true;
             }
             else if (inlineValue !== undefined) {

@@ -21,6 +21,17 @@ if (!cmd || cmd === "help" || flags.help) {
 const nonInteractive = isNonInteractive(flags);
 const apiBase = resolveApiBase(flags, config);
 
+async function loadResetShared() {
+  try {
+    return await import("../packages/cli/bin/lib/reset-shared.js");
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : String(err);
+    throw new Error(
+      `reset shared module missing. Run "pnpm --filter openclaw-manager build" before reset. (${detail})`
+    );
+  }
+}
+
 try {
   if (cmd === "status") {
     const auth = await resolveAuthHeader({ flags, config, nonInteractive });
@@ -50,7 +61,7 @@ try {
   }
 
   if (cmd === "reset") {
-    const result = resetEnvironment({ flags, config });
+    const result = await resetEnvironment({ flags, config });
     for (const line of result.messages) {
       console.log(line);
     }
@@ -1141,96 +1152,23 @@ function stopAll(params) {
   return { ok: true, messages };
 }
 
-function resetEnvironment(params) {
-  const dryRun = params.flags["dry-run"] === true;
-  const keepClawdbot = params.flags["keep-clawdbot"] === true;
-  const skipStop = params.flags["no-stop"] === true;
-  const force = params.flags.force === true;
-  const messages = [];
-  const errors = [];
-
-  if (!skipStop) {
-    const stopResult = stopAll({ flags: params.flags, config: params.config });
-    for (const line of stopResult.messages) {
-      messages.push(line);
-    }
-    if (!stopResult.ok) {
-      messages.push(`warn: stop-all failed (${stopResult.error ?? "unknown"})`);
-    }
-  }
-
-  const configDir = resolveConfigDir(params.flags);
-  const installDir = resolveInstallDir(params.flags);
-  const clawdbotDir = resolveClawdbotDir(params.flags);
+async function resetEnvironment(params) {
+  const { resetEnvironmentShared } = await loadResetShared();
   const sandboxDirs = listSandboxInstances().map((entry) => entry.rootDir);
-
-  const targets = [
-    { label: "config", path: configDir },
-    { label: "install", path: installDir },
-    ...sandboxDirs.map((dir) => ({ label: "sandbox", path: dir }))
-  ];
-  if (!keepClawdbot) {
-    targets.push({ label: "clawdbot", path: clawdbotDir });
-  }
-
-  const removed = [];
-  for (const target of targets) {
-    if (!target.path) continue;
-    const resolved = path.resolve(target.path);
-    const safe = isSafeResetPath(resolved);
-    const expected = isExpectedResetPath(resolved);
-    if (!safe) {
-      errors.push(`refuse remove unsafe path (${resolved})`);
-      continue;
-    }
-    if (!expected && !force) {
-      errors.push(`refuse remove ${resolved} (use --force)`);
-      continue;
-    }
-    if (dryRun) {
-      messages.push(`[dry-run] ${target.label}: remove ${resolved}`);
-      continue;
-    }
-    if (!fs.existsSync(resolved)) {
-      messages.push(`${target.label}: not found (${resolved})`);
-      continue;
-    }
-    try {
-      fs.rmSync(resolved, { recursive: true, force: true });
-      removed.push(`${target.label}: removed (${resolved})`);
-    } catch (err) {
-      errors.push(`${target.label}: failed to remove (${resolved}): ${String(err)}`);
-    }
-  }
-
-  messages.push(...removed);
-  if (errors.length) {
-    return { ok: false, error: errors.join("; "), messages };
-  }
-  return { ok: true, messages };
-}
-
-function resolveClawdbotDir(flags) {
-  const value = flags["clawdbot-dir"] ?? process.env.CLAWDBOT_DIR;
-  if (typeof value === "string" && value.trim()) return value.trim();
-  return path.join(os.homedir(), ".clawdbot");
-}
-
-function isSafeResetPath(resolved) {
-  if (!resolved) return false;
-  const blocked = new Set([path.resolve("/"), path.resolve(os.homedir()), path.resolve(os.tmpdir())]);
-  if (blocked.has(path.resolve(resolved))) return false;
-  return true;
-}
-
-function isExpectedResetPath(resolved) {
-  const normalized = resolved.replace(/\\/g, "/");
-  return (
-    normalized.includes("/clawdbot-manager") ||
-    normalized.includes("/.clawdbot-manager") ||
-    normalized.includes("/.clawdbot") ||
-    normalized.endsWith("/clawdbot-manager")
-  );
+  return resetEnvironmentShared({
+    flags: {
+      dryRun: params.flags["dry-run"] === true,
+      keepClawdbot: params.flags["keep-clawdbot"] === true,
+      noStop: params.flags["no-stop"] === true,
+      force: params.flags.force === true,
+      configDir: params.flags["config-dir"],
+      configPath: params.flags["config-path"],
+      installDir: params.flags["install-dir"],
+      clawdbotDir: params.flags["clawdbot-dir"]
+    },
+    stopAll: () => stopAll({ flags: params.flags, config: params.config }),
+    sandboxDirs
+  });
 }
 
 function getListeningPids(ports) {
