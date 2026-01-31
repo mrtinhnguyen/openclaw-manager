@@ -1,35 +1,15 @@
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-export type WizardStep =
-    | "auth"
-    | "cli"
-    | "gateway"
-    | "token"
-    | "ai"
-    | "pairing"
-    | "probe"
-    | "complete";
-
-export const STEPS = [
-    { id: "auth" as const, label: "管理员登录", description: "保护控制台访问" },
-    { id: "cli" as const, label: "安装 CLI", description: "准备运行环境" },
-    { id: "gateway" as const, label: "启动网关", description: "自动启动本地服务" },
-    { id: "token" as const, label: "配置 Token", description: "连接 Discord Bot" },
-    { id: "ai" as const, label: "配置 AI", description: "启用模型能力" },
-    { id: "pairing" as const, label: "配对验证", description: "授权用户访问" },
-    { id: "probe" as const, label: "通道探测", description: "验证通道连接" },
-    { id: "complete" as const, label: "开始使用", description: "一切就绪" }
-];
+import { ONBOARDING_STEPS, type OnboardingStep } from "@/features/onboarding/onboarding-steps";
 
 interface WizardSidebarProps {
-    currentStep: WizardStep;
+    currentStep: OnboardingStep;
     isConnected: boolean;
     error?: string | null;
 }
 
 export function WizardSidebar({ currentStep, isConnected, error }: WizardSidebarProps) {
-    const currentStepIndex = STEPS.findIndex((s) => s.id === currentStep);
+    const currentStepIndex = ONBOARDING_STEPS.findIndex((s) => s.id === currentStep);
 
     return (
         <aside className="relative hidden md:flex w-80 shrink-0 flex-col border-r border-line/40 bg-white/40 backdrop-blur-xl p-8">
@@ -41,7 +21,7 @@ export function WizardSidebar({ currentStep, isConnected, error }: WizardSidebar
 
             {/* Step list */}
             <nav className="flex-1 space-y-2">
-                {STEPS.map((step, idx) => {
+                {ONBOARDING_STEPS.map((step, idx) => {
                     const isFinal = currentStep === "complete" && idx === currentStepIndex;
                     const isCompleted = idx < currentStepIndex || isFinal;
                     const isCurrent = idx === currentStepIndex && !isFinal;
@@ -56,7 +36,7 @@ export function WizardSidebar({ currentStep, isConnected, error }: WizardSidebar
                             )}
                         >
                             {/* Vertical line connector */}
-                            {idx < STEPS.length - 1 && (
+                            {idx < ONBOARDING_STEPS.length - 1 && (
                                 <div
                                     className={cn(
                                         "absolute left-[2.25rem] top-[3.5rem] w-0.5 h-8 transition-all duration-300",
@@ -112,15 +92,15 @@ export function WizardSidebar({ currentStep, isConnected, error }: WizardSidebar
 }
 
 interface MobileProgressProps {
-    currentStep: WizardStep;
+    currentStep: OnboardingStep;
 }
 
 export function MobileProgress({ currentStep }: MobileProgressProps) {
-    const currentStepIndex = STEPS.findIndex((s) => s.id === currentStep);
+    const currentStepIndex = ONBOARDING_STEPS.findIndex((s) => s.id === currentStep);
 
     return (
         <div className="md:hidden mb-6 flex justify-center gap-2">
-            {STEPS.map((step, idx) => {
+            {ONBOARDING_STEPS.map((step, idx) => {
                 const isFinal = currentStep === "complete" && idx === currentStepIndex;
                 const isCompleted = idx < currentStepIndex || isFinal;
                 const isCurrent = idx === currentStepIndex && !isFinal;

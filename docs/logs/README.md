@@ -79,6 +79,7 @@
 - `docs/logs/v0.0.77-npm-release-ui-guard/README.md`
 - `docs/logs/v0.0.78-onboarding-domain-mvp/README.md`
 - `docs/logs/v0.0.79-discord-allowfrom-strict/README.md`
+- `docs/logs/v0.0.80-onboarding-flow-machine/README.md`
 
 ## 写日志的标准
 

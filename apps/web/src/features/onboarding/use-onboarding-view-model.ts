@@ -16,8 +16,10 @@ export function useOnboardingViewModel() {
   const authConfigured = useConfigStore((state) => state.authConfigured);
 
   const currentStep = useOnboardingStore((store) => store.currentStep);
+  const systemStep = useOnboardingStore((store) => store.systemStep);
   const pendingStep = useOnboardingStore((store) => store.pendingStep);
   const pendingSince = useOnboardingStore((store) => store.pendingSince);
+  const blockingReason = useOnboardingStore((store) => store.blockingReason);
   const inputs = useOnboardingStore((store) => store.inputs);
   const messages = useOnboardingStore((store) => store.messages);
   const isProcessing = useOnboardingStore((store) => store.isProcessing);
@@ -46,8 +48,10 @@ export function useOnboardingViewModel() {
       buildOnboardingViewModel({
         state: {
           currentStep,
+          systemStep,
           pendingStep,
           pendingSince,
+          blockingReason,
           inputs,
           messages,
           isProcessing,
@@ -64,8 +68,10 @@ export function useOnboardingViewModel() {
       }),
     [
       currentStep,
+      systemStep,
       pendingStep,
       pendingSince,
+      blockingReason,
       inputs,
       messages,
       isProcessing,

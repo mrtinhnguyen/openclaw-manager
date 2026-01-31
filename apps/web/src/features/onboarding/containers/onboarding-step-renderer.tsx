@@ -1,5 +1,4 @@
-import { useOnboardingStore } from "@/stores/onboarding-store";
-
+import type { OnboardingStep } from "../onboarding-steps";
 import { AuthStepContainer } from "../steps/auth-step.container";
 import { CliStepContainer } from "../steps/cli-step.container";
 import { GatewayStepContainer } from "../steps/gateway-step.container";
@@ -9,9 +8,7 @@ import { PairingStepContainer } from "../steps/pairing-step.container";
 import { ProbeStepContainer } from "../steps/probe-step.container";
 import { CompleteStepContainer } from "../steps/complete-step.container";
 
-export function OnboardingStepRenderer() {
-  const currentStep = useOnboardingStore((state) => state.currentStep);
-
+export function OnboardingStepRenderer({ currentStep }: { currentStep: OnboardingStep }) {
   if (currentStep === "auth") return <AuthStepContainer />;
   if (currentStep === "cli") return <CliStepContainer />;
   if (currentStep === "gateway") return <GatewayStepContainer />;

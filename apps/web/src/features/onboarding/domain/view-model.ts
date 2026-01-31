@@ -1,8 +1,9 @@
-import type { WizardStep } from "@/components/wizard-sidebar";
 import type { JobState } from "@/stores/jobs-store";
 import type { OnboardingInputs, OnboardingMessages } from "@/stores/onboarding-store";
 
 import type { OnboardingContext } from "./context";
+import type { OnboardingBlockingReason } from "./machine";
+import type { OnboardingStep } from "../onboarding-steps";
 
 type JobBundle = {
   cli: JobState<{ version?: string | null }>;
@@ -13,9 +14,11 @@ type JobBundle = {
 };
 
 export type OnboardingViewModel = {
-  currentStep: WizardStep;
-  pendingStep: WizardStep | null;
+  currentStep: OnboardingStep;
+  systemStep: OnboardingStep;
+  pendingStep: OnboardingStep | null;
   pendingSince: string | null;
+  blockingReason: OnboardingBlockingReason | null;
   jobsRunning: boolean;
   auth: {
     username: string;
@@ -87,9 +90,11 @@ export type OnboardingViewModel = {
 
 export function buildOnboardingViewModel(params: {
   state: {
-    currentStep: WizardStep;
-    pendingStep: WizardStep | null;
+    currentStep: OnboardingStep;
+    systemStep: OnboardingStep;
+    pendingStep: OnboardingStep | null;
     pendingSince: string | null;
+    blockingReason: OnboardingBlockingReason | null;
     inputs: OnboardingInputs;
     messages: OnboardingMessages;
     isProcessing: boolean;
@@ -108,8 +113,10 @@ export function buildOnboardingViewModel(params: {
 
   return {
     currentStep: state.currentStep,
+    systemStep: state.systemStep,
     pendingStep: state.pendingStep,
     pendingSince: state.pendingSince,
+    blockingReason: state.blockingReason,
     jobsRunning,
     auth: {
       username: state.inputs.authUser,

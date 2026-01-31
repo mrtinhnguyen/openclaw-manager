@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
-import type { WizardStep } from "@/components/wizard-sidebar";
+import type { OnboardingBlockingReason } from "@/features/onboarding/domain/machine";
+import type { OnboardingStep } from "@/features/onboarding/onboarding-steps";
 
 export type OnboardingInputs = {
   tokenInput: string;
@@ -21,15 +22,22 @@ export type OnboardingMessages = {
 };
 
 type OnboardingState = {
-  currentStep: WizardStep;
-  pendingStep: WizardStep | null;
+  currentStep: OnboardingStep;
+  systemStep: OnboardingStep;
+  pendingStep: OnboardingStep | null;
   pendingSince: string | null;
+  blockingReason: OnboardingBlockingReason | null;
   inputs: OnboardingInputs;
   messages: OnboardingMessages;
   isProcessing: boolean;
   autoStarted: boolean;
-  setCurrentStep: (value: WizardStep | ((prev: WizardStep) => WizardStep)) => void;
-  setPendingStep: (value: WizardStep | null) => void;
+  setFlowState: (flow: {
+    currentStep: OnboardingStep;
+    systemStep: OnboardingStep;
+    pendingStep: OnboardingStep | null;
+    pendingSince: string | null;
+    blockingReason: OnboardingBlockingReason | null;
+  }) => void;
   setTokenInput: (value: string) => void;
   setAiProvider: (value: string) => void;
   setAiKeyInput: (value: string) => void;
@@ -66,26 +74,22 @@ const initialMessages: OnboardingMessages = {
 
 export const useOnboardingStore = create<OnboardingState>((set) => ({
   currentStep: "auth",
+  systemStep: "auth",
   pendingStep: null,
   pendingSince: null,
+  blockingReason: null,
   inputs: initialInputs,
   messages: initialMessages,
   isProcessing: false,
   autoStarted: false,
-  setCurrentStep: (value) =>
-    set((state) => ({
-      currentStep: typeof value === "function" ? value(state.currentStep) : value
+  setFlowState: (flow) =>
+    set(() => ({
+      currentStep: flow.currentStep,
+      systemStep: flow.systemStep,
+      pendingStep: flow.pendingStep,
+      pendingSince: flow.pendingSince,
+      blockingReason: flow.blockingReason
     })),
-  setPendingStep: (value) =>
-    set((state) => {
-      if (state.pendingStep === value) {
-        return state;
-      }
-      return {
-        pendingStep: value,
-        pendingSince: value ? new Date().toISOString() : null
-      };
-    }),
   setTokenInput: (value) =>
     set((state) => ({ inputs: { ...state.inputs, tokenInput: value } })),
   setAiProvider: (value) =>

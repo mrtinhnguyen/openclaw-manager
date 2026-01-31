@@ -1,26 +1,23 @@
-import type { WizardStep } from "@/components/wizard-sidebar";
-
-import { resolveNextStep, stepIndex } from "../onboarding-steps";
+import { resolveNextStep, stepIndex, type OnboardingStep } from "../onboarding-steps";
 import type { OnboardingContext } from "./context";
 
+export type OnboardingBlockingReason =
+  | { type: "pending-confirmation"; step: OnboardingStep; since: string | null }
+  | { type: "system-behind"; expectedStep: OnboardingStep; currentStep: OnboardingStep };
+
 export type OnboardingFlowState = {
-  currentStep: WizardStep;
-  pendingStep: WizardStep | null;
+  currentStep: OnboardingStep;
+  systemStep: OnboardingStep;
+  pendingStep: OnboardingStep | null;
+  pendingSince: string | null;
+  blockingReason: OnboardingBlockingReason | null;
 };
 
-export type OnboardingFlowDecision = {
-  targetStep: WizardStep;
-  nextStep: WizardStep;
-  pendingStep: WizardStep | null;
-  clearedPending: WizardStep | null;
-  reason: "status-advance" | "no-advance";
-};
-
-export function resolveOnboardingFlow(
+export function syncOnboardingFlow(
   state: OnboardingFlowState,
   context: OnboardingContext
-): OnboardingFlowDecision {
-  const targetStep = resolveNextStep({
+): OnboardingFlowState {
+  const systemStep = resolveNextStep({
     authRequired: context.authRequired,
     authHeader: context.authHeader,
     cliInstalled: context.cliInstalled,
@@ -31,26 +28,77 @@ export function resolveOnboardingFlow(
     probeOk: context.probeOk
   });
 
-  const nextStep =
-    stepIndex(targetStep) > stepIndex(state.currentStep) ? targetStep : state.currentStep;
+  const nextCurrentStep =
+    stepIndex(systemStep) > stepIndex(state.currentStep) ? systemStep : state.currentStep;
 
   let pendingStep = state.pendingStep;
-  let clearedPending: WizardStep | null = null;
+  let pendingSince = state.pendingSince;
   if (pendingStep && isStepSatisfied(context, pendingStep)) {
-    clearedPending = pendingStep;
     pendingStep = null;
+    pendingSince = null;
   }
 
-  return {
-    targetStep,
-    nextStep,
+  const blockingReason = resolveBlockingReason({
     pendingStep,
-    clearedPending,
-    reason: nextStep !== state.currentStep ? "status-advance" : "no-advance"
+    pendingSince,
+    systemStep,
+    currentStep: nextCurrentStep
+  });
+
+  return {
+    currentStep: nextCurrentStep,
+    systemStep,
+    pendingStep,
+    pendingSince,
+    blockingReason
   };
 }
 
-export function isStepSatisfied(context: OnboardingContext, step: WizardStep): boolean {
+export function requestOnboardingConfirmation(
+  state: OnboardingFlowState,
+  step: OnboardingStep,
+  now: string = new Date().toISOString()
+): OnboardingFlowState {
+  if (state.pendingStep === step) {
+    return {
+      ...state,
+      blockingReason: resolveBlockingReason({
+        pendingStep: state.pendingStep,
+        pendingSince: state.pendingSince,
+        systemStep: state.systemStep,
+        currentStep: state.currentStep
+      })
+    };
+  }
+  return {
+    ...state,
+    pendingStep: step,
+    pendingSince: now,
+    blockingReason: {
+      type: "pending-confirmation",
+      step,
+      since: now
+    }
+  };
+}
+
+function resolveBlockingReason(params: {
+  pendingStep: OnboardingStep | null;
+  pendingSince: string | null;
+  systemStep: OnboardingStep;
+  currentStep: OnboardingStep;
+}): OnboardingBlockingReason | null {
+  const { pendingStep, pendingSince, systemStep, currentStep } = params;
+  if (pendingStep) {
+    return { type: "pending-confirmation", step: pendingStep, since: pendingSince };
+  }
+  if (stepIndex(systemStep) < stepIndex(currentStep)) {
+    return { type: "system-behind", expectedStep: systemStep, currentStep };
+  }
+  return null;
+}
+
+export function isStepSatisfied(context: OnboardingContext, step: OnboardingStep): boolean {
   switch (step) {
     case "auth":
       return !context.authRequired || Boolean(context.authHeader);

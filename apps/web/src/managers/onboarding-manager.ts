@@ -1,15 +1,16 @@
-import type { WizardStep } from "@/components/wizard-sidebar";
 import type { OnboardingContext } from "@/features/onboarding/domain/context";
-import { resolveOnboardingFlow } from "@/features/onboarding/domain/machine";
+import {
+  requestOnboardingConfirmation,
+  syncOnboardingFlow,
+  type OnboardingFlowState
+} from "@/features/onboarding/domain/machine";
+import type { OnboardingStep } from "@/features/onboarding/onboarding-steps";
 import { useConfigStore } from "@/stores/config-store";
 import { useJobsStore } from "@/stores/jobs-store";
 import { useOnboardingStore } from "@/stores/onboarding-store";
 import { useStatusStore } from "@/stores/status-store";
 
 export class OnboardingManager {
-  setCurrentStep = (value: WizardStep | ((prev: WizardStep) => WizardStep)) =>
-    useOnboardingStore.getState().setCurrentStep(value);
-  setPendingStep = (value: WizardStep | null) => useOnboardingStore.getState().setPendingStep(value);
   setTokenInput = (value: string) => useOnboardingStore.getState().setTokenInput(value);
   setAiProvider = (value: string) => useOnboardingStore.getState().setAiProvider(value);
   setAiKeyInput = (value: string) => useOnboardingStore.getState().setAiKeyInput(value);
@@ -28,18 +29,12 @@ export class OnboardingManager {
 
   handleStatusUpdate = (context: OnboardingContext) => {
     const onboarding = useOnboardingStore.getState();
-    const decision = resolveOnboardingFlow(
-      {
-        currentStep: onboarding.currentStep,
-        pendingStep: onboarding.pendingStep
-      },
-      context
-    );
-    if (decision.clearedPending) {
-      clearPendingMessages(decision.clearedPending, onboarding);
+    const previousPending = onboarding.pendingStep;
+    const nextFlow = syncOnboardingFlow(getFlowState(onboarding), context);
+    onboarding.setFlowState(nextFlow);
+    if (previousPending && !nextFlow.pendingStep) {
+      clearPendingMessages(previousPending, onboarding);
     }
-    onboarding.setPendingStep(decision.pendingStep);
-    onboarding.setCurrentStep(decision.nextStep);
   };
 
   handleAuthSubmit = async () => {
@@ -69,7 +64,7 @@ export class OnboardingManager {
       onboarding.setCliMessage(`安装失败: ${result.error}`);
     } else {
       onboarding.setCliMessage("安装完成，等待系统确认...");
-      onboarding.setPendingStep("cli");
+      applyPendingStep(onboarding, "cli");
     }
     onboarding.setIsProcessing(false);
   };
@@ -84,7 +79,7 @@ export class OnboardingManager {
     if (result.ok) {
       onboarding.setTokenInput("");
       onboarding.setMessage("Token 已保存，等待系统确认...");
-      onboarding.setPendingStep("token");
+      applyPendingStep(onboarding, "token");
     } else {
       onboarding.setMessage(`保存失败: ${result.error}`);
     }
@@ -104,7 +99,7 @@ export class OnboardingManager {
     if (result.ok) {
       onboarding.setAiKeyInput("");
       onboarding.setAiMessage("AI 凭证已保存，等待系统确认...");
-      onboarding.setPendingStep("ai");
+      applyPendingStep(onboarding, "ai");
     } else {
       onboarding.setAiMessage(`配置失败: ${result.error}`);
     }
@@ -122,7 +117,7 @@ export class OnboardingManager {
     if (result.ok) {
       onboarding.setPairingInput("");
       onboarding.setMessage("配对成功，等待系统确认...");
-      onboarding.setPendingStep("pairing");
+      applyPendingStep(onboarding, "pairing");
       const probe = await useJobsStore.getState().startQuickstartJob({
         runProbe: true,
         startGateway: true
@@ -152,7 +147,7 @@ export class OnboardingManager {
       onboarding.setMessage(`启动失败: ${result.error}`);
     } else if (result.result?.gatewayReady) {
       onboarding.setMessage("网关已就绪，等待系统确认...");
-      onboarding.setPendingStep("gateway");
+      applyPendingStep(onboarding, "gateway");
     } else {
       onboarding.setMessage("网关正在启动中...");
     }
@@ -169,7 +164,7 @@ export class OnboardingManager {
     });
     if (probe.ok && probe.result?.probeOk) {
       onboarding.setProbeMessage("通道探测通过，等待系统确认...");
-      onboarding.setPendingStep("probe");
+      applyPendingStep(onboarding, "probe");
     } else if (probe.ok) {
       onboarding.setProbeMessage("通道探测未通过，请重试。");
     } else {
@@ -191,7 +186,28 @@ export class OnboardingManager {
   };
 }
 
-function clearPendingMessages(step: WizardStep, onboarding: ReturnType<typeof useOnboardingStore.getState>) {
+function getFlowState(onboarding: ReturnType<typeof useOnboardingStore.getState>): OnboardingFlowState {
+  return {
+    currentStep: onboarding.currentStep,
+    systemStep: onboarding.systemStep,
+    pendingStep: onboarding.pendingStep,
+    pendingSince: onboarding.pendingSince,
+    blockingReason: onboarding.blockingReason
+  };
+}
+
+function applyPendingStep(
+  onboarding: ReturnType<typeof useOnboardingStore.getState>,
+  step: OnboardingStep
+) {
+  const nextFlow = requestOnboardingConfirmation(getFlowState(onboarding), step);
+  onboarding.setFlowState(nextFlow);
+}
+
+function clearPendingMessages(
+  step: OnboardingStep,
+  onboarding: ReturnType<typeof useOnboardingStore.getState>
+) {
   if (step === "cli") {
     onboarding.setCliMessage("CLI 已确认，继续下一步。");
     return;

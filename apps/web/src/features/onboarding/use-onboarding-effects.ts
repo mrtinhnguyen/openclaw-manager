@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import type { WizardStep } from "@/components/wizard-sidebar";
+import type { OnboardingStep } from "./onboarding-steps";
 
 import type { OnboardingActions } from "./onboarding-types";
 import type { OnboardingContext } from "./domain/context";
@@ -119,7 +119,7 @@ export function useOnboardingFlow(params: OnboardingFlowParams) {
 }
 
 type EnterSubmitParams = {
-  currentStep: WizardStep;
+  currentStep: OnboardingStep;
   authRequired: boolean;
   authHeader: string | null;
   cliInstalled: boolean;
