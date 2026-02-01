@@ -1,13 +1,11 @@
-import { resolveNextStep, stepIndex, type OnboardingStep } from "../onboarding-steps";
+import { resolveNextStep, type OnboardingStep } from "../onboarding-steps";
 import type { OnboardingContext } from "./context";
 
 export type OnboardingBlockingReason =
-  | { type: "pending-confirmation"; step: OnboardingStep; since: string | null }
-  | { type: "system-behind"; expectedStep: OnboardingStep; currentStep: OnboardingStep };
+  | { type: "pending-confirmation"; step: OnboardingStep; since: string | null };
 
 export type OnboardingFlowState = {
   currentStep: OnboardingStep;
-  systemStep: OnboardingStep;
   pendingStep: OnboardingStep | null;
   pendingSince: string | null;
   blockingReason: OnboardingBlockingReason | null;
@@ -17,17 +15,15 @@ export function syncOnboardingFlow(
   state: OnboardingFlowState,
   context: OnboardingContext
 ): OnboardingFlowState {
-  const systemStep = resolveNextStep({
+  const nextStep = resolveNextStep({
     cliInstalled: context.cliInstalled,
     gatewayOk: context.gatewayOk,
-    tokenConfigured: context.tokenConfigured,
-    aiConfigured: context.aiConfigured,
-    allowFromConfigured: context.allowFromConfigured,
-    probeOk: context.probeOk
+    gatewayVerified: context.gatewayVerified,
+    tokenConfirmed: context.tokenConfirmed,
+    aiConfirmed: context.aiConfirmed,
+    pairingConfirmed: context.pairingConfirmed,
+    probeConfirmed: context.probeConfirmed
   });
-
-  const nextCurrentStep =
-    stepIndex(systemStep) > stepIndex(state.currentStep) ? systemStep : state.currentStep;
 
   let pendingStep = state.pendingStep;
   let pendingSince = state.pendingSince;
@@ -38,14 +34,11 @@ export function syncOnboardingFlow(
 
   const blockingReason = resolveBlockingReason({
     pendingStep,
-    pendingSince,
-    systemStep,
-    currentStep: nextCurrentStep
+    pendingSince
   });
 
   return {
-    currentStep: nextCurrentStep,
-    systemStep,
+    currentStep: nextStep,
     pendingStep,
     pendingSince,
     blockingReason
@@ -62,9 +55,7 @@ export function requestOnboardingConfirmation(
       ...state,
       blockingReason: resolveBlockingReason({
         pendingStep: state.pendingStep,
-        pendingSince: state.pendingSince,
-        systemStep: state.systemStep,
-        currentStep: state.currentStep
+        pendingSince: state.pendingSince
       })
     };
   }
@@ -83,15 +74,10 @@ export function requestOnboardingConfirmation(
 function resolveBlockingReason(params: {
   pendingStep: OnboardingStep | null;
   pendingSince: string | null;
-  systemStep: OnboardingStep;
-  currentStep: OnboardingStep;
 }): OnboardingBlockingReason | null {
-  const { pendingStep, pendingSince, systemStep, currentStep } = params;
+  const { pendingStep, pendingSince } = params;
   if (pendingStep) {
     return { type: "pending-confirmation", step: pendingStep, since: pendingSince };
-  }
-  if (stepIndex(systemStep) < stepIndex(currentStep)) {
-    return { type: "system-behind", expectedStep: systemStep, currentStep };
   }
   return null;
 }
@@ -101,16 +87,16 @@ export function isStepSatisfied(context: OnboardingContext, step: OnboardingStep
     case "cli":
       return context.cliInstalled;
     case "gateway":
-      return context.gatewayOk;
+      return context.gatewayVerified || context.gatewayOk;
     case "token":
-      return context.tokenConfigured;
+      return context.tokenConfirmed;
     case "ai":
-      return context.aiConfigured;
+      return context.aiConfirmed;
     case "pairing":
-      return context.allowFromConfigured || context.probeOk;
+      return context.pairingConfirmed;
     case "probe":
     case "complete":
-      return context.probeOk;
+      return context.probeConfirmed;
     default:
       return false;
   }

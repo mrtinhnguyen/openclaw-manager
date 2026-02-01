@@ -4,47 +4,40 @@ import { AuthStep } from "@/components/wizard-steps";
 import { Card } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { usePresenter } from "@/presenter/presenter-context";
+
 import { useAuthStore } from "@/stores/auth-store";
-import { useStatusStore } from "@/stores/status-store";
 
 export function AuthGate({ children }: { children: ReactNode }) {
   const presenter = usePresenter();
   const authHeader = useAuthStore((state) => state.authHeader);
-  const refreshStatus = useStatusStore((state) => state.refresh);
-  const status = useStatusStore((state) => state.status);
-  const statusError = useStatusStore((state) => state.error);
-  const statusLoading = useStatusStore((state) => state.loading);
+  const authenticated = useAuthStore((state) => state.authenticated);
+  const sessionChecked = useAuthStore((state) => state.sessionChecked);
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    if (authHeader) return;
+    if (authHeader || authenticated || sessionChecked) return;
     let active = true;
     (async () => {
-      await refreshStatus();
-      if (active) setChecked(true);
+      const result = await presenter.auth.checkSession();
+      if (!active) return;
+      if (!result.ok) {
+        setMessage("登录验证失败，请稍后重试");
+      }
     })();
     return () => {
       active = false;
     };
-  }, [authHeader, refreshStatus]);
+  }, [authHeader, authenticated, sessionChecked, presenter.auth]);
 
-  useEffect(() => {
-    if (!checked || authHeader || status) return;
-    if (statusError && statusError !== "需要登录") {
-      setMessage(statusError);
-    }
-  }, [checked, authHeader, status, statusError]);
-
-  if (authHeader || status) {
+  if (authHeader || authenticated) {
     return <>{children}</>;
   }
 
-  if (!checked && (statusLoading || !statusError)) {
+  if (!sessionChecked) {
     return (
       <div className="min-h-screen bg-bg text-ink flex">
         <div className="fixed inset-0 pointer-events-none">
@@ -75,7 +68,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
     if (result.ok) {
       setMessage("登录成功，正在加载配置...");
       setPassword("");
-      await refreshStatus();
+      await presenter.status.refresh();
     } else {
       setMessage(`登录失败: ${result.error}`);
     }

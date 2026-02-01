@@ -1,6 +1,6 @@
 {
   "name": "openclaw-manager",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "type": "module",
   "bin": {
     "openclaw-manager": "bin/openclaw-manager.js"

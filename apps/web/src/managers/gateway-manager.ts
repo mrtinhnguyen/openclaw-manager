@@ -1,7 +1,7 @@
 import { requestFlowConfirmation } from "@/features/onboarding/domain/flow-actions";
 import { useGatewayStore } from "@/stores/gateway-store";
-import { useJobsStore } from "@/stores/jobs-store";
 
+import { jobsManager } from "./jobs-manager";
 export class GatewayManager {
   setMessage = (value: string | null) => useGatewayStore.getState().setMessage(value);
   setIsProcessing = (value: boolean) => useGatewayStore.getState().setIsProcessing(value);
@@ -9,8 +9,11 @@ export class GatewayManager {
 
   autoStart = async () => {
     const gateway = useGatewayStore.getState();
-    gateway.setMessage("正在自动启动网关...");
-    const result = await useJobsStore.getState().startQuickstartJob({
+    if (gateway.isProcessing) return;
+    gateway.setIsProcessing(true);
+    gateway.setAutoStarted(true);
+    gateway.setMessage("正在启动网关...");
+    const result = await jobsManager.startQuickstartJob({
       startGateway: true,
       runProbe: false
     });
@@ -21,14 +24,16 @@ export class GatewayManager {
     } else {
       gateway.setMessage("网关正在启动中...");
     }
-    gateway.setAutoStarted(true);
+    gateway.setIsProcessing(false);
   };
 
   retry = async () => {
     const gateway = useGatewayStore.getState();
+    if (gateway.isProcessing) return;
     gateway.setIsProcessing(true);
+    gateway.setAutoStarted(true);
     gateway.setMessage("正在重启网关...");
-    const result = await useJobsStore.getState().startQuickstartJob({
+    const result = await jobsManager.startQuickstartJob({
       startGateway: true,
       runProbe: false
     });

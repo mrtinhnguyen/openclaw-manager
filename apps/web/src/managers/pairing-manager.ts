@@ -1,8 +1,8 @@
-import { requestFlowConfirmation } from "@/features/onboarding/domain/flow-actions";
-import { useJobsStore } from "@/stores/jobs-store";
 import { usePairingStore } from "@/stores/pairing-store";
 import { useProbeStore } from "@/stores/probe-store";
+import { useOnboardingStore } from "@/stores/onboarding-store";
 import { runProbeAfterPairing } from "./probe-manager";
+import { jobsManager } from "./jobs-manager";
 
 export class PairingManager {
   setValue = (value: string) => usePairingStore.getState().setValue(value);
@@ -16,11 +16,11 @@ export class PairingManager {
     pairing.setIsProcessing(true);
     pairing.setMessage(null);
     useProbeStore.getState().setMessage(null);
-    const result = await useJobsStore.getState().startPairingJob(code);
+    const result = await jobsManager.startPairingJob(code);
     if (result.ok) {
       pairing.setValue("");
-      pairing.setMessage("配对成功，等待系统确认...");
-      requestFlowConfirmation("pairing");
+      pairing.setMessage("配对成功，准备进入通道探测...");
+      useOnboardingStore.getState().setEvents({ pairingConfirmed: true });
       await runProbeAfterPairing();
     } else {
       pairing.setMessage(`配对失败: ${result.error}`);

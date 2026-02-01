@@ -1,6 +1,7 @@
 import { requestFlowConfirmation } from "@/features/onboarding/domain/flow-actions";
 import { useCliStore } from "@/stores/cli-store";
-import { useJobsStore } from "@/stores/jobs-store";
+
+import { jobsManager } from "./jobs-manager";
 
 export class CliManager {
   setMessage = (value: string | null) => useCliStore.getState().setMessage(value);
@@ -10,7 +11,7 @@ export class CliManager {
     const cli = useCliStore.getState();
     cli.setIsProcessing(true);
     cli.setMessage("正在启动安装任务...");
-    const result = await useJobsStore.getState().startCliInstallJob();
+    const result = await jobsManager.startCliInstallJob();
     if (!result.ok) {
       cli.setMessage(`安装失败: ${result.error}`);
     } else {

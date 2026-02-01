@@ -93,11 +93,29 @@ export function createJobStreamHandler(deps: ApiDeps): Handler {
     }
 
     const encoder = new TextEncoder();
+    let closed = false;
+    let cleanup = () => {};
     const stream = new ReadableStream<Uint8Array>({
       start(controller) {
+        const closeStream = () => {
+          if (closed) return;
+          closed = true;
+          try {
+            controller.close();
+          } catch {
+            // ignore double close
+          }
+          cleanup();
+        };
+
         const send = (event: string, data: Record<string, unknown>) => {
+          if (closed) return;
           const payload = `event: ${event}\n` + `data: ${JSON.stringify(data)}\n\n`;
-          controller.enqueue(encoder.encode(payload));
+          try {
+            controller.enqueue(encoder.encode(payload));
+          } catch {
+            closeStream();
+          }
         };
 
         send("status", {
@@ -113,12 +131,12 @@ export function createJobStreamHandler(deps: ApiDeps): Handler {
 
         if (job.status === "success") {
           send("done", { result: job.result ?? null });
-          controller.close();
+          closeStream();
           return;
         }
         if (job.status === "failed") {
           send("error", { error: job.error ?? "failed" });
-          controller.close();
+          closeStream();
           return;
         }
 
@@ -129,23 +147,45 @@ export function createJobStreamHandler(deps: ApiDeps): Handler {
             send("status", { status: event.status });
           } else if (event.type === "done") {
             send("done", { result: event.result ?? null });
-            cleanup();
-            controller.close();
+            closeStream();
           } else if (event.type === "error") {
             send("error", { error: event.error });
-            cleanup();
-            controller.close();
+            closeStream();
           }
         });
 
         const keepAlive = setInterval(() => {
-          controller.enqueue(encoder.encode(": keep-alive\n\n"));
+          if (closed) return;
+          try {
+            controller.enqueue(encoder.encode(": keep-alive\n\n"));
+          } catch {
+            closeStream();
+          }
         }, 15000);
 
-        const cleanup = () => {
-          clearInterval(keepAlive);
-          unsubscribe();
-        };
+        const signal = c.req.raw.signal;
+        if (signal) {
+          if (signal.aborted) {
+            closeStream();
+            return;
+          }
+          signal.addEventListener("abort", closeStream, { once: true });
+          cleanup = () => {
+            clearInterval(keepAlive);
+            unsubscribe();
+            signal.removeEventListener("abort", closeStream);
+          };
+        } else {
+          cleanup = () => {
+            clearInterval(keepAlive);
+            unsubscribe();
+          };
+        }
+      },
+      cancel() {
+        if (closed) return;
+        closed = true;
+        cleanup();
       }
     });
 

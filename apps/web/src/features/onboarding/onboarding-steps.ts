@@ -9,7 +9,7 @@ export type OnboardingStep =
 
 export const ONBOARDING_STEPS = [
   { id: "cli", label: "安装 CLI", description: "准备运行环境" },
-  { id: "gateway", label: "启动网关", description: "自动启动本地服务" },
+  { id: "gateway", label: "验证网关", description: "确认本地服务可用" },
   { id: "token", label: "配置 Token", description: "连接 Discord Bot" },
   { id: "ai", label: "配置 AI", description: "启用模型能力" },
   { id: "pairing", label: "配对验证", description: "授权用户访问" },
@@ -35,24 +35,27 @@ export function getOnboardingStepMeta(step: OnboardingStep) {
 export function resolveNextStep(params: {
   cliInstalled: boolean;
   gatewayOk: boolean;
-  tokenConfigured: boolean;
-  aiConfigured: boolean;
-  allowFromConfigured: boolean;
-  probeOk: boolean;
+  gatewayVerified: boolean;
+  tokenConfirmed: boolean;
+  aiConfirmed: boolean;
+  pairingConfirmed: boolean;
+  probeConfirmed: boolean;
 }): OnboardingStep {
   const {
     cliInstalled,
     gatewayOk,
-    tokenConfigured,
-    aiConfigured,
-    allowFromConfigured,
-    probeOk
+    gatewayVerified,
+    tokenConfirmed,
+    aiConfirmed,
+    pairingConfirmed,
+    probeConfirmed
   } = params;
+  const gatewayReady = gatewayOk || gatewayVerified;
   if (!cliInstalled) return "cli";
-  if (probeOk) return "complete";
-  if (gatewayOk && tokenConfigured && !aiConfigured) return "ai";
-  if (gatewayOk && tokenConfigured && aiConfigured && allowFromConfigured) return "probe";
-  if (gatewayOk && tokenConfigured && aiConfigured) return "pairing";
-  if (gatewayOk) return "token";
+  if (probeConfirmed) return "complete";
+  if (gatewayReady && tokenConfirmed && !aiConfirmed) return "ai";
+  if (gatewayReady && tokenConfirmed && aiConfirmed && pairingConfirmed) return "probe";
+  if (gatewayReady && tokenConfirmed && aiConfirmed) return "pairing";
+  if (gatewayReady) return "token";
   return "gateway";
 }

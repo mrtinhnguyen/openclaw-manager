@@ -12,7 +12,6 @@ export function getFlowState(): OnboardingFlowState {
   const flow = useOnboardingStore.getState();
   return {
     currentStep: flow.currentStep,
-    systemStep: flow.systemStep,
     pendingStep: flow.pendingStep,
     pendingSince: flow.pendingSince,
     blockingReason: flow.blockingReason

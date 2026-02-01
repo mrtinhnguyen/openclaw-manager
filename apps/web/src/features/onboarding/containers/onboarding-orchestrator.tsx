@@ -10,7 +10,7 @@ import { useJobsStore } from "@/stores/jobs-store";
 
 import type { OnboardingStep } from "../onboarding-steps";
 import {
-  useAutoStartGateway,
+  useAutoStartGatewayOnDemand,
   useEnterKeySubmit,
   useStatusPolling,
   useOnboardingFlow as useOnboardingFlowEffect
@@ -35,12 +35,13 @@ export function OnboardingOrchestrator() {
   const probeProcessing = useProbeStore((state) => state.isProcessing);
 
   useStatusPolling(presenter.status.refresh, jobsRunning);
-  useAutoStartGateway({
-    autoStarted: gatewayState.autoStarted,
+  useAutoStartGatewayOnDemand({
+    currentStep: flow.currentStep,
     hasStatus: Boolean(status),
     cliInstalled: context.cliInstalled,
     quickstartRunning: quickstartStatus === "running",
     gatewayOk: context.gatewayOk,
+    gatewayProcessing: gatewayState.isProcessing,
     startGateway: presenter.gateway.autoStart
   });
   useOnboardingFlowEffect({

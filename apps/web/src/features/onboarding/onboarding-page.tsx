@@ -50,10 +50,5 @@ function buildBlockingMessage(reason: OnboardingBlockingReason | null) {
     const step = getOnboardingStepMeta(reason.step);
     return `正在等待系统确认「${step.label}」。确认完成后会自动进入下一步。`;
   }
-  if (reason.type === "system-behind") {
-    const expected = getOnboardingStepMeta(reason.expectedStep);
-    const current = getOnboardingStepMeta(reason.currentStep);
-    return `系统仍停留在「${expected.label}」，当前已进入「${current.label}」。流程不会回退，但需要该步骤完成确认才能继续。`;
-  }
   return null;
 }

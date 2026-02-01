@@ -1,6 +1,6 @@
 import { requestFlowConfirmation } from "@/features/onboarding/domain/flow-actions";
 import { useAiStore } from "@/stores/ai-store";
-import { useJobsStore } from "@/stores/jobs-store";
+import { jobsManager } from "./jobs-manager";
 
 export class AiManager {
   setProvider = (value: string) => useAiStore.getState().setProvider(value);
@@ -14,7 +14,7 @@ export class AiManager {
     if (!apiKey) return;
     ai.setIsProcessing(true);
     ai.setMessage(null);
-    const result = await useJobsStore.getState().startAiAuthJob(ai.provider, apiKey);
+    const result = await jobsManager.startAiAuthJob(ai.provider, apiKey);
     if (result.ok) {
       ai.setValue("");
       ai.setMessage("AI 凭证已保存，等待系统确认...");

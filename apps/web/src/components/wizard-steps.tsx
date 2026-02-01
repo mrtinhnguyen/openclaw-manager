@@ -175,7 +175,7 @@ interface GatewayStepProps {
     logs: string[];
     jobStatus: JobStatus;
     jobError: string | null;
-    onRetry: () => void;
+    onStart: () => void;
 }
 
 export function GatewayStep({
@@ -186,18 +186,23 @@ export function GatewayStep({
     logs,
     jobStatus,
     jobError,
-    onRetry
+    onStart
 }: GatewayStepProps) {
+    const isStarting = isProcessing || jobStatus === "running";
     const title = isReady
-        ? "网关已就绪"
+        ? "网关已验证"
         : jobStatus === "failed"
-            ? "网关启动失败"
-            : "正在启动网关...";
+            ? "网关验证失败"
+            : isStarting
+                ? "正在验证网关..."
+                : "等待网关启动";
     const subtitle = isReady
         ? "正在自动进入下一步..."
         : jobStatus === "failed"
-            ? "请查看日志并重试。"
-            : "请稍候，网关正在后台启动中";
+            ? "请查看日志并重试启动。"
+            : isStarting
+                ? "请稍候，系统正在检查网关状态。"
+                : "点击下方按钮启动网关，或稍后在后续步骤按需启动。";
 
     return (
         <div className="space-y-6 p-8 text-center">
@@ -212,10 +217,10 @@ export function GatewayStep({
                 <h2 className="text-2xl font-semibold">{title}</h2>
                 <p className="mt-2 text-sm text-muted">{subtitle}</p>
             </div>
-            {!isReady && autoStarted && (
-                <Button onClick={onRetry} disabled={isProcessing} variant="outline">
+            {!isReady && (
+                <Button onClick={onStart} disabled={isProcessing} variant="outline">
                     {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                    重试启动
+                    {autoStarted ? "重试启动" : "启动网关"}
                 </Button>
             )}
             <JobLogPanel title="启动日志" logs={logs} status={jobStatus} />

@@ -1,4 +1,5 @@
-import { resolveAuthState } from "../lib/auth.js";
+import { resolveSessionSecret, verifySessionToken } from "../lib/auth-session.js";
+import { resolveAuthState, verifyAuthHeader } from "../lib/auth.js";
 
 type AuthStatus = {
   required: boolean;
@@ -20,6 +21,35 @@ export function getAuthStatus(authDisabled: boolean): AuthStatus {
   const authState = resolveAuthState(authDisabled);
   return {
     required: !authDisabled,
+    configured: authState.configured
+  };
+}
+
+export function checkAuthSession(
+  authDisabled: boolean,
+  header: string | null,
+  sessionToken: string | null
+) {
+  if (authDisabled) {
+    return {
+      ok: true,
+      authenticated: true,
+      disabled: true,
+      required: false,
+      configured: false
+    };
+  }
+
+  const authState = resolveAuthState(authDisabled);
+  const headerOk = header ? verifyAuthHeader(header, authState) : false;
+  const secret = resolveSessionSecret(authDisabled);
+  const cookieOk =
+    secret && sessionToken ? verifySessionToken(sessionToken, secret).ok : false;
+
+  return {
+    ok: true,
+    authenticated: headerOk || cookieOk,
+    required: true,
     configured: authState.configured
   };
 }

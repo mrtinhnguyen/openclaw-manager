@@ -23,7 +23,7 @@ export function GatewayStepContainer() {
       logs={job.logs}
       jobStatus={job.status}
       jobError={job.error}
-      onRetry={presenter.gateway.retry}
+      onStart={presenter.gateway.autoStart}
     />
   );
 }

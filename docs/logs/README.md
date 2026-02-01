@@ -84,6 +84,11 @@
 - `docs/logs/v0.0.82-auth-session-cookie/README.md`
 - `docs/logs/v0.0.83-dev-auth-required/README.md`
 - `docs/logs/v0.0.84-default-auth/README.md`
+- `docs/logs/v0.0.85-auth-session-light-service/README.md`
+- `docs/logs/v0.0.86-job-stream-sse-safe/README.md`
+- `docs/logs/v0.0.87-remove-migration-artifacts/README.md`
+- `docs/logs/v0.0.88-onboarding-pairing-event/README.md`
+- `docs/logs/v0.0.89-onboarding-strict-step/README.md`
 
 ## 写日志的标准
 

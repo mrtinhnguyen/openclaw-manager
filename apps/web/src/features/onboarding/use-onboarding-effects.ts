@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import type { OnboardingStep } from "./onboarding-steps";
 
@@ -14,43 +14,52 @@ export function useStatusPolling(refresh: () => Promise<void>, jobsRunning: bool
 }
 
 type AutoStartParams = {
-  autoStarted: boolean;
+  currentStep: OnboardingStep;
   hasStatus: boolean;
   cliInstalled: boolean;
   quickstartRunning: boolean;
   gatewayOk: boolean;
+  gatewayProcessing: boolean;
   startGateway: () => Promise<void>;
 };
 
-export function useAutoStartGateway(params: AutoStartParams) {
+const autoStartSteps: OnboardingStep[] = ["token", "ai", "pairing", "probe"];
+
+export function useAutoStartGatewayOnDemand(params: AutoStartParams) {
   const {
-    autoStarted,
+    currentStep,
     hasStatus,
     cliInstalled,
     quickstartRunning,
     gatewayOk,
+    gatewayProcessing,
     startGateway
   } = params;
+  const lastRequestedStepRef = useRef<OnboardingStep | null>(null);
 
   useEffect(() => {
-    if (
-      autoStarted ||
-      !hasStatus ||
-      !cliInstalled ||
-      quickstartRunning
-    ) {
-      return;
-    }
     if (gatewayOk) {
+      lastRequestedStepRef.current = null;
+    }
+  }, [gatewayOk]);
+
+  useEffect(() => {
+    if (!autoStartSteps.includes(currentStep)) return;
+    if (!hasStatus || !cliInstalled || quickstartRunning || gatewayOk || gatewayProcessing) {
       return;
     }
+    if (lastRequestedStepRef.current === currentStep) {
+      return;
+    }
+    lastRequestedStepRef.current = currentStep;
     void startGateway();
   }, [
-    autoStarted,
+    currentStep,
     hasStatus,
     cliInstalled,
     quickstartRunning,
     gatewayOk,
+    gatewayProcessing,
     startGateway
   ]);
 }
@@ -71,10 +80,14 @@ export function useOnboardingFlow(params: OnboardingFlowParams) {
     hasStatus,
     context.cliInstalled,
     context.gatewayOk,
+    context.gatewayVerified,
     context.tokenConfigured,
     context.aiConfigured,
-    context.allowFromConfigured,
     context.probeOk,
+    context.tokenConfirmed,
+    context.aiConfirmed,
+    context.pairingConfirmed,
+    context.probeConfirmed,
     onStatusUpdate
   ]);
 }

@@ -12,12 +12,57 @@ import { useOnboardingStore } from "@/stores/onboarding-store";
 export class OnboardingManager {
   handleStatusUpdate = (context: OnboardingContext) => {
     const onboarding = useOnboardingStore.getState();
+    const nextEvents = syncEventsFromContext(context, onboarding.events);
+    if (nextEvents) {
+      onboarding.setEvents(nextEvents);
+    }
     const previousPending = onboarding.pendingStep;
-    const nextFlow = syncFlowWithContext(context);
+    const nextFlow = syncFlowWithContext({
+      ...context,
+      gatewayVerified: nextEvents?.gatewayVerified ?? context.gatewayVerified,
+      tokenConfirmed: nextEvents?.tokenConfirmed ?? context.tokenConfirmed,
+      aiConfirmed: nextEvents?.aiConfirmed ?? context.aiConfirmed,
+      pairingConfirmed: nextEvents?.pairingConfirmed ?? context.pairingConfirmed,
+      probeConfirmed: nextEvents?.probeConfirmed ?? context.probeConfirmed
+    });
     if (previousPending && !nextFlow.pendingStep) {
       clearPendingMessages(previousPending);
     }
   };
+}
+
+function syncEventsFromContext(
+  context: OnboardingContext,
+  current: {
+    gatewayVerified: boolean;
+    tokenConfirmed: boolean;
+    aiConfirmed: boolean;
+    pairingConfirmed: boolean;
+    probeConfirmed: boolean;
+  }
+): Partial<typeof current> | null {
+  const next: Partial<typeof current> = {};
+
+  if (context.tokenConfigured !== current.tokenConfirmed) {
+    next.tokenConfirmed = context.tokenConfigured;
+  }
+  if (context.gatewayOk && !current.gatewayVerified) {
+    next.gatewayVerified = true;
+  }
+  if (!context.cliInstalled && current.gatewayVerified) {
+    next.gatewayVerified = false;
+  }
+  if (context.aiConfigured !== current.aiConfirmed) {
+    next.aiConfirmed = context.aiConfigured;
+  }
+  if (context.probeOk !== current.probeConfirmed) {
+    next.probeConfirmed = context.probeOk;
+  }
+  if (!context.tokenConfigured && current.pairingConfirmed) {
+    next.pairingConfirmed = false;
+  }
+
+  return Object.keys(next).length ? next : null;
 }
 
 function clearPendingMessages(step: OnboardingStep) {

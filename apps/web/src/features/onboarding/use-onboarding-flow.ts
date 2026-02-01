@@ -10,25 +10,25 @@ export function useOnboardingFlow() {
   const loading = useStatusStore((state) => state.loading);
 
   const currentStep = useOnboardingStore((store) => store.currentStep);
-  const systemStep = useOnboardingStore((store) => store.systemStep);
   const pendingStep = useOnboardingStore((store) => store.pendingStep);
   const pendingSince = useOnboardingStore((store) => store.pendingSince);
   const blockingReason = useOnboardingStore((store) => store.blockingReason);
+  const events = useOnboardingStore((store) => store.events);
 
   const context = useMemo(
     () =>
       deriveOnboardingContext({
         status,
-        loading
+        loading,
+        events
       }),
-    [status, loading]
+    [status, loading, events]
   );
 
   return {
     context,
     flow: {
       currentStep,
-      systemStep,
       pendingStep,
       pendingSince,
       blockingReason

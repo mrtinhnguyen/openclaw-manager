@@ -1,8 +1,5 @@
 import { create } from "zustand";
 
-import { useAuthStore } from "./auth-store";
-import { useConfigStore } from "./config-store";
-
 export type CommandEntry = {
   id: string;
   title: string;
@@ -72,101 +69,35 @@ type StatusState = {
   loading: boolean;
   error: string | null;
   lastUpdated: string | null;
-  refresh: () => Promise<void>;
-  startProcess: (id: string) => Promise<void>;
-  stopProcess: (id: string) => Promise<void>;
-  setDiscordToken: (token: string) => Promise<{ ok: boolean; error?: string }>;
+  setStatusData: (data: StatusResponse) => void;
+  setLoading: (value: boolean) => void;
+  setError: (value: string | null) => void;
+  clearStatus: () => void;
 };
 
-export const useStatusStore = create<StatusState>((set, get) => ({
+export const useStatusStore = create<StatusState>((set) => ({
   status: null,
   commands: [],
   processes: [],
   loading: false,
   error: null,
   lastUpdated: null,
-  refresh: async () => {
-    const config = useConfigStore.getState();
-    const auth = useAuthStore.getState();
-    const { apiBase, gatewayHost, gatewayPort } = config;
-    set({ loading: true, error: null });
-    try {
-      const params = new URLSearchParams({
-        gatewayHost: gatewayHost || "127.0.0.1",
-        gatewayPort: gatewayPort || "18789"
-      });
-      const res = await fetch(`${apiBase}/api/status?${params.toString()}`, {
-        headers: auth.authHeader ? { authorization: auth.authHeader } : {},
-        credentials: "include"
-      });
-      if (res.status === 401) {
-        auth.clearAuth();
-        set({ loading: false, error: "需要登录" });
-        return;
-      }
-      if (!res.ok) throw new Error(`Status failed: ${res.status}`);
-      const data = (await res.json()) as StatusResponse;
-      set({
-        status: data,
-        commands: data.commands,
-        processes: data.processes,
-        lastUpdated: data.now,
-        loading: false,
-        error: null
-      });
-    } catch (err) {
-      set({
-        loading: false,
-        error: err instanceof Error ? err.message : String(err)
-      });
-    }
-  },
-  startProcess: async (id) => {
-    const config = useConfigStore.getState();
-    const auth = useAuthStore.getState();
-    await fetch(`${config.apiBase}/api/processes/start`, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        ...(auth.authHeader ? { authorization: auth.authHeader } : {})
-      },
-      credentials: "include",
-      body: JSON.stringify({ id })
-    });
-    await get().refresh();
-  },
-  stopProcess: async (id) => {
-    const config = useConfigStore.getState();
-    const auth = useAuthStore.getState();
-    await fetch(`${config.apiBase}/api/processes/stop`, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        ...(auth.authHeader ? { authorization: auth.authHeader } : {})
-      },
-      credentials: "include",
-      body: JSON.stringify({ id })
-    });
-    await get().refresh();
-  },
-  setDiscordToken: async (token) => {
-    const config = useConfigStore.getState();
-    const auth = useAuthStore.getState();
-    try {
-      const res = await fetch(`${config.apiBase}/api/discord/token`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          ...(auth.authHeader ? { authorization: auth.authHeader } : {})
-        },
-        credentials: "include",
-        body: JSON.stringify({ token })
-      });
-      const data = (await res.json()) as { ok: boolean; error?: string };
-      await get().refresh();
-      return data;
-    } catch (err) {
-      return { ok: false, error: err instanceof Error ? err.message : String(err) };
-    }
-  }
+  setStatusData: (data) =>
+    set({
+      status: data,
+      commands: data.commands,
+      processes: data.processes,
+      lastUpdated: data.now,
+      loading: false,
+      error: null
+    }),
+  setLoading: (value) => set({ loading: value }),
+  setError: (value) => set({ error: value }),
+  clearStatus: () =>
+    set({
+      status: null,
+      commands: [],
+      processes: [],
+      lastUpdated: null
+    })
 }));

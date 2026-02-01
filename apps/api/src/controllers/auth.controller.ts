@@ -1,5 +1,5 @@
 import type { Handler } from "hono";
-import { setCookie } from "hono/cookie";
+import { getCookie, setCookie } from "hono/cookie";
 
 import type { ApiDeps } from "../deps.js";
 import {
@@ -8,12 +8,25 @@ import {
   getSessionTtlSeconds,
   resolveSessionSecret
 } from "../lib/auth-session.js";
-import { getAuthStatus, loginWithCredentials } from "../services/auth.service.js";
+import {
+  checkAuthSession,
+  getAuthStatus,
+  loginWithCredentials
+} from "../services/auth.service.js";
 
 export function createAuthStatusHandler(deps: ApiDeps): Handler {
   return (c) => {
     const status = getAuthStatus(deps.auth.disabled);
     return c.json({ ok: true, ...status });
+  };
+}
+
+export function createAuthSessionHandler(deps: ApiDeps): Handler {
+  return (c) => {
+    const header = c.req.header("authorization") ?? null;
+    const session = getCookie(c, getSessionCookieName()) ?? null;
+    const result = checkAuthSession(deps.auth.disabled, header, session);
+    return c.json(result);
   };
 }
 

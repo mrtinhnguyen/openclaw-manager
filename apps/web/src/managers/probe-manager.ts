@@ -1,7 +1,7 @@
 import { requestFlowConfirmation } from "@/features/onboarding/domain/flow-actions";
-import { useJobsStore } from "@/stores/jobs-store";
 import { useProbeStore } from "@/stores/probe-store";
 
+import { jobsManager } from "./jobs-manager";
 type ProbeRunOptions = {
   requestPending: boolean;
   successMessage: string;
@@ -11,7 +11,7 @@ async function runProbeFlow(options: ProbeRunOptions) {
   const probeState = useProbeStore.getState();
   probeState.setIsProcessing(true);
   probeState.setMessage("正在探测通道...");
-  const probe = await useJobsStore.getState().startQuickstartJob({
+  const probe = await jobsManager.startQuickstartJob({
     runProbe: true,
     startGateway: true
   });
