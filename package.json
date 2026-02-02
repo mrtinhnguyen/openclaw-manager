@@ -13,6 +13,7 @@
   "scripts": {
     "dev": "pnpm --filter clawdbot-manager-api dev:all",
     "dev:web": "pnpm --filter clawdbot-manager-web dev",
+    "dev:landing": "pnpm --filter clawdbot-manager-landing dev",
     "dev:api": "pnpm --filter clawdbot-manager-api dev",
     "manager:cli": "node scripts/manager-cli.mjs",
     "manager:status": "node scripts/manager-cli.mjs status",
