@@ -39,6 +39,7 @@
     "build": "pnpm -r --if-present build",
     "lint": "pnpm -r --if-present lint",
     "deploy:pages": "pnpm --filter clawdbot-manager-web deploy:pages",
+    "deploy:landing": "pnpm --filter clawdbot-manager-landing deploy:pages",
     "changeset": "changeset",
     "release:check": "pnpm build:openclaw-manager && pnpm lint && pnpm -r --if-present tsc",
     "release:version": "changeset version",
