@@ -62,7 +62,7 @@ export const useOnboardingStore = create<OnboardingState>()(
         }))
     }),
     {
-      name: "openclaw-manager-onboarding",
+      name: "blockclaw-manager-onboarding",
       version: 1,
       partialize: (state) => ({
         events: state.events

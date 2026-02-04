@@ -24,7 +24,7 @@ export const useConfigStore = create<ConfigState>()(
       setGatewayPort: (value) => set({ gatewayPort: value.trim() })
     }),
     {
-      name: "clawdbot-manager-ui",
+      name: "blockclaw-manager-ui",
       version: 4,
       partialize: (state) => ({
         apiBase: state.apiBase,

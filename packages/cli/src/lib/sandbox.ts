@@ -12,7 +12,7 @@ export function listSandboxDirs(): string[] {
   }
   return entries
     .filter((entry) => {
-      return entry.isDirectory() && entry.name.startsWith("openclaw-manager-sandbox-");
+      return entry.isDirectory() && entry.name.startsWith("blockclaw-manager-sandbox-");
     })
     .map((entry) => path.join(dir, entry.name));
 }

@@ -1,79 +1,78 @@
-# 安装与前端使用
+# Installation and Frontend Usage
 
-本指南面向需要通过脚本一键部署并使用前端控制台的用户。
+This guide is for users who need to deploy via script and use the frontend console.
 
-基础非 Docker 场景请先看：[docs/get-started-basic.md](docs/get-started-basic.md)。
-Docker 场景请先看：[docs/get-started-docker.md](docs/get-started-docker.md)。
+For basic non-Docker scenarios, please see: [docs/get-started-basic.md](docs/get-started-basic.md).
+For Docker scenarios, please see: [docs/get-started-docker.md](docs/get-started-docker.md).
 
-## 一键安装
+## One-Click Installation
 
 ### Linux / macOS
 
 ```bash
-curl -fsSL https://openclaw-manager.com/install.sh | bash
+curl -fsSL https://blockclaw.app/install.sh | bash
 ```
 
-一行带账号密码（推荐）：
+One-line with credentials (recommended):
 ```bash
-curl -fsSL https://openclaw-manager.com/install.sh | MANAGER_ADMIN_USER=admin MANAGER_ADMIN_PASS=pass bash
+curl -fsSL https://blockclaw.app/install.sh | MANAGER_ADMIN_USER=admin MANAGER_ADMIN_PASS=pass bash
 ```
 
-提示：安装过程会提示输入管理员账号/密码；如在非交互环境（CI/脚本）运行，请提前设置
-`MANAGER_ADMIN_USER` 与 `MANAGER_ADMIN_PASS`。
+Tip: The installation process will prompt for an admin username/password; if running in a non-interactive environment (CI/script), please set `MANAGER_ADMIN_USER` and `MANAGER_ADMIN_PASS` in advance.
 
 ### Windows (PowerShell)
 
 ```powershell
-iwr https://openclaw-manager.com/install.ps1 -UseBasicParsing | iex
+iwr https://blockclaw.app/install.ps1 -UseBasicParsing | iex
 ```
 
-## Docker 一键启动
+## Docker One-Click Start
 
 ```bash
-curl -fsSL https://openclaw-manager.com/docker.sh | bash
+curl -fsSL https://blockclaw.app/docker.sh | bash
 ```
 
-更多参数说明见 [Docker 部署指南](/docker)。
+For more parameters, see [Docker Deployment Guide](/docker).
 
-## 安装后使用前端
+## Using the Frontend After Installation
 
-1) 打开浏览器访问：
+1) Open your browser and visit:
 - `http://<your-host>:17321/`
-2) 使用安装脚本设置的管理员账号登录
-3) 按向导依次完成：CLI 安装、网关启动、Discord Token、AI Provider、配对、探测
+2) Log in using the admin account set during installation
+3) Follow the wizard to complete: CLI installation, Gateway startup, Discord Token, AI Provider, Pairing, Probing
 
-提示：脚本默认绑定 `MANAGER_API_HOST=0.0.0.0`，VPS 需放行 `17321` 端口；如需仅本机访问，设置 `MANAGER_API_HOST=127.0.0.1`。
-脚本在未安装 Node.js 时会询问是否自动安装（可设置 `MANAGER_AUTO_INSTALL_NODE=1` 直接同意）。
+Tip: The script binds `MANAGER_API_HOST=0.0.0.0` by default. VPS users need to allow port `17321`; for local-only access, set `MANAGER_API_HOST=127.0.0.1`.
+The script will ask to install Node.js if missing (set `MANAGER_AUTO_INSTALL_NODE=1` to auto-agree).
 
-## 常用环境变量
+## Common Environment Variables
 
-Linux / macOS（示例）：
+Linux / macOS (Example):
 ```bash
 MANAGER_ADMIN_USER=admin \
 MANAGER_ADMIN_PASS=pass \
 MANAGER_API_PORT=17321 \
 MANAGER_AUTO_INSTALL_NODE=1 \
-curl -fsSL https://openclaw-manager.com/install.sh | bash
+curl -fsSL https://blockclaw.app/install.sh | bash
 ```
 
-常见变量：
+Common Variables:
 
 - `MANAGER_ADMIN_USER` / `MANAGER_ADMIN_PASS`
-- `MANAGER_API_HOST`（默认 `0.0.0.0`）
-- `MANAGER_API_PORT`（默认 `17321`）
-- `MANAGER_PUBLIC_HOST`（用于打印公网链接）
-- `MANAGER_AUTO_INSTALL_NODE=1`（无 Node 时自动安装）
+- `MANAGER_API_HOST` (Default `0.0.0.0`)
+- `MANAGER_API_PORT` (Default `17321`)
+- `MANAGER_PUBLIC_HOST` (Used for printing public links)
+- `MANAGER_AUTO_INSTALL_NODE=1` (Auto-install Node if missing)
 
-Windows PowerShell（示例）：
+Windows PowerShell (Example):
 ```powershell
 $env:MANAGER_ADMIN_USER="admin"
 $env:MANAGER_ADMIN_PASS="pass"
 $env:MANAGER_API_PORT="17321"
-iwr https://openclaw-manager.com/install.ps1 -UseBasicParsing | iex
+iwr https://blockclaw.app/install.ps1 -UseBasicParsing | iex
 ```
 
-## 常见问题
+## Common Issues
 
-- 打不开页面：确认 `MANAGER_API_PORT` 端口已放行且服务已启动
-- 忘记管理员账号：请重新运行安装脚本并设置新的管理员账号
-- 需要停止服务：在安装目录执行 `pnpm manager:server-stop`（需要本机权限）
+- Cannot open page: Confirm `MANAGER_API_PORT` is allowed and service is started
+- Forgot admin account: Re-run the installation script and set a new admin account
+- Need to stop service: Run `pnpm manager:server-stop` in the installation directory (requires local permissions)

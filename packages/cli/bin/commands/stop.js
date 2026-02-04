@@ -9,7 +9,7 @@ export function stopManager(flags) {
     const errors = [];
     let stopped = false;
     if (process.platform !== "win32" && commandExists("systemctl")) {
-        const serviceName = "clawdbot-manager";
+        const serviceName = "blockclaw-manager";
         const servicePath = `/etc/systemd/system/${serviceName}.service`;
         if (fs.existsSync(servicePath)) {
             const result = spawnSync("systemctl", ["stop", serviceName], { encoding: "utf-8" });

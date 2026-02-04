@@ -1,26 +1,26 @@
 # YYYY-MM-DD <Title>
 
-## 背景 / 问题
+## Background / Problem
 
-- 为什么要做（用户痛点/动机/现状问题）
+- Why are we doing this? (User pain points / Motivation / Current issues)
 
-## 规则（可选）
+## Rules (Optional)
 
-- 规划类文档不要写具体工期，只写里程碑顺序与验收标准
-- 规划类文档文件名建议以 `.plan.md` 结尾，便于区分“规划”与“实现日志”
+- Planning documents should not contain specific timelines, only milestone sequences and acceptance criteria.
+- Planning document filenames are suggested to end with `.plan.md` to distinguish "planning" from "implementation logs".
 
-## 决策
+## Decisions
 
-- 做什么、不做什么（关键取舍）
+- What to do, what NOT to do (Key trade-offs)
 
-## 变更内容
+## Changes
 
-- 用户可见变化（CLI 行为/输出/默认值等）
-- 关键实现点（指向 core/cli 的关键模块即可）
+- User-visible changes (CLI behavior / Output / Defaults, etc.)
+- Key implementation points (Point to key modules in core/cli)
 
-## 验证（怎么确认符合预期）
+## Verification (How to confirm expectations)
 
-保持轻量：3～6 条命令 + 明确的“验收点”。
+Keep it lightweight: 3-6 commands + clear "Acceptance Points".
 
 ```bash
 # build / lint / typecheck
@@ -28,38 +28,38 @@ pnpm build
 pnpm lint
 pnpm typecheck
 
-# smoke-check（按需补充）
+# smoke-check (add as needed)
 pnpm -s cli --help
 ```
 
-验收点：
+Acceptance Points:
 
-- 写清楚“看到什么输出/行为才算对”
+- Clearly state "what output/behavior counts as correct"
 
-## 发布 / 部署
+## Release / Deployment
 
-如果这次变更会影响 npm 包或线上环境，需要写清楚如何发布。
+If this change affects npm packages or online environments, clarify how to publish.
 
 ```bash
-# 1) 写 changeset（选择受影响的 packages）
+# 1) Create changeset (select affected packages)
 pnpm changeset
 
-# 2) 本地验证
+# 2) Local verification
 pnpm release:check
 pnpm release:dry
 
-# 3) 版本号 & changelog
+# 3) Version & changelog
 pnpm release:version
 
-# 4) 发布到 npm（需要 NPM_TOKEN 或已登录）
+# 4) Publish to npm (requires NPM_TOKEN or login)
 pnpm release
 ```
 
-备注：
+Notes:
 
-- 需要更详细的发布说明时，引用 `docs/workflows/npm-release-process.md`，不要在每篇日志里重复一遍。
+- For more detailed release instructions, refer to `docs/workflows/npm-release-process.md`; do not repeat it in every log.
 
-## 影响范围 / 风险
+## Impact / Risks
 
-- Breaking change?（是/否）
-- 回滚方式（如果需要）
+- Breaking change? (Yes/No)
+- Rollback method (if needed)

@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 
-$defaultRepoUrl = "https://github.com/Peiiii/openclaw-manager.git"
+$defaultRepoUrl = "https://github.com/mrtinhnguyen/openclaw-manager.git"
 $repoUrl = $env:MANAGER_REPO_URL
 $apiPort = if ($env:MANAGER_API_PORT) { $env:MANAGER_API_PORT } else { "17321" }
 $apiHost = if ($env:MANAGER_API_HOST) { $env:MANAGER_API_HOST } else { "0.0.0.0" }
@@ -34,8 +34,8 @@ if (-not (Get-Command "pnpm" -ErrorAction SilentlyContinue)) {
   }
 }
 
-$installDir = if ($env:MANAGER_INSTALL_DIR) { $env:MANAGER_INSTALL_DIR } else { Join-Path $env:USERPROFILE "clawdbot-manager" }
-$configDir = if ($env:MANAGER_CONFIG_DIR) { $env:MANAGER_CONFIG_DIR } else { Join-Path $env:USERPROFILE ".clawdbot-manager" }
+$installDir = if ($env:MANAGER_INSTALL_DIR) { $env:MANAGER_INSTALL_DIR } else { Join-Path $env:USERPROFILE "blockclaw-manager" }
+$configDir = if ($env:MANAGER_CONFIG_DIR) { $env:MANAGER_CONFIG_DIR } else { Join-Path $env:USERPROFILE ".blockclaw-manager" }
 
 if (Test-Path $installDir) {
   if (-not (Test-Path (Join-Path $installDir ".git"))) {
@@ -78,8 +78,8 @@ node apps/api/scripts/create-admin.mjs `
   --password "$($env:MANAGER_ADMIN_PASS)" `
   --config (Join-Path $configDir "config.json")
 
-$logPath = if ($env:MANAGER_LOG_PATH) { $env:MANAGER_LOG_PATH } else { Join-Path $env:TEMP "clawdbot-manager.log" }
-$errorLogPath = if ($env:MANAGER_ERROR_LOG_PATH) { $env:MANAGER_ERROR_LOG_PATH } else { Join-Path $env:TEMP "clawdbot-manager.error.log" }
+$logPath = if ($env:MANAGER_LOG_PATH) { $env:MANAGER_LOG_PATH } else { Join-Path $env:TEMP "blockclaw-manager.log" }
+$errorLogPath = if ($env:MANAGER_ERROR_LOG_PATH) { $env:MANAGER_ERROR_LOG_PATH } else { Join-Path $env:TEMP "blockclaw-manager.error.log" }
 if ($errorLogPath -eq $logPath) {
   $errorLogPath = "$logPath.err"
 }

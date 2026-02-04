@@ -7,6 +7,6 @@ dist/
 *.log
 coverage/
 manager.toml
-clawdbot.manager.toml
+blockclaw.manager.toml
 .npmrc.publish.local
 .npmrc

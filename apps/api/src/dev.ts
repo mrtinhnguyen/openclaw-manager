@@ -17,7 +17,7 @@ const openBrowser =
   (process.env.MANAGER_OPEN_BROWSER ?? process.env.ONBOARDING_OPEN_BROWSER) !== "0";
 const apiBaseUrl = `http://127.0.0.1:${apiPort}`;
 const viteCacheDir =
-  process.env.VITE_CACHE_DIR ?? path.join(os.tmpdir(), "clawdbot-manager-vite");
+  process.env.VITE_CACHE_DIR ?? path.join(os.tmpdir(), "blockclaw-manager-vite");
 
 const apiEnv: NodeJS.ProcessEnv = {
   ...process.env,
@@ -31,12 +31,12 @@ if (typeof process.env.MANAGER_AUTH_DISABLED === "string") {
   apiEnv.MANAGER_AUTH_DISABLED = process.env.MANAGER_AUTH_DISABLED;
 }
 
-const apiProcess = spawnWithLabel("api", "pnpm", ["--filter", "clawdbot-manager-api", "dev"], {
+const apiProcess = spawnWithLabel("api", "pnpm", ["--filter", "blockclaw-manager-api", "dev"], {
   cwd: repoRoot,
   env: apiEnv
 });
 
-const webProcess = spawnWithLabel("web", "pnpm", ["--filter", "clawdbot-manager-web", "dev"], {
+const webProcess = spawnWithLabel("web", "pnpm", ["--filter", "blockclaw-manager-web", "dev"], {
   cwd: repoRoot,
   env: {
     ...process.env,
@@ -161,7 +161,7 @@ function findRepoRoot(start: string): string | null {
       try {
         const raw = fs.readFileSync(candidate, "utf-8");
         const parsed = JSON.parse(raw) as { name?: string };
-        if (parsed.name === "clawdbot-manager") return current;
+        if (parsed.name === "blockclaw-manager") return current;
       } catch {
         // ignore and continue
       }

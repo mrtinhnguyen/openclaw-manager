@@ -4,73 +4,94 @@
     "howItWorks": "How It Works"
   },
   "hero": {
-    "title1": "Graphical Installation",
-    "title2": "OpenClaw",
-    "title3": "Made Easy",
-    "description": "OpenClaw Manager lets you deploy OpenClaw AI assistant with one click. Supports Discord, WhatsApp, Telegram and more platforms. Your data stays under your control.",
-    "installTitle": "Recommended Installation",
+    "title1": "Deploy Your",
+    "title2": "Crypto AI Agent",
+    "title3": "In One Click",
+    "description": "BlockClaw Manager lets you automate trading, monitor on-chain activities, and manage wallets via chat apps. 100% local, secure, and under your control.",
+    "installTitle": "Recommended Install",
     "copy": "Copy",
     "copied": "Copied",
     "github": "GitHub"
   },
   "features": {
     "title": "Why Choose",
-    "subtitle": "A truly capable AI assistant at your fingertips",
+    "subtitle": "The ultimate on-chain command center powered by AI",
     "items": {
       "localFirst": {
-        "title": "Local First",
-        "description": "Run on your own device with complete data control. No privacy concerns."
+        "title": "Local & Secure",
+        "description": "Your keys never leave your machine. Full data sovereignty with local execution."
       },
       "multiChannel": {
-        "title": "Multi-Channel Support",
-        "description": "Supports Discord, WhatsApp, Telegram, Slack and other major messaging platforms."
+        "title": "Chat-Ops Ready",
+        "description": "Control your portfolio via Discord, Telegram, WhatsApp, and Slack."
       },
       "aiAssistant": {
-        "title": "AI Assistant",
-        "description": "24/7 AI assistant supporting multiple LLMs for intelligent conversations."
+        "title": "AI Alpha Hunter",
+        "description": "24/7 market monitoring and sentiment analysis powered by advanced LLMs."
       },
       "secure": {
-        "title": "Secure & Reliable",
-        "description": "End-to-end encrypted communication with auditable open source code."
+        "title": "Bank-Grade Security",
+        "description": "End-to-end encrypted communication. Open source and auditable."
       },
       "oneClickDeploy": {
-        "title": "One-Click Deploy",
-        "description": "Simple installation scripts for deployment in minutes without complex server setup."
+        "title": "Instant Deploy",
+        "description": "Simple installation script. Be up and running in minutes."
       },
       "modelCompatible": {
-        "title": "Model Compatible",
-        "description": "Supports OpenAI, Claude, and various other AI providers."
+        "title": "Multi-Model Support",
+        "description": "Compatible with OpenAI, Claude, and specialized crypto LLMs."
       },
       "realtime": {
-        "title": "Real-time Response",
-        "description": "Optimized inference engine with millisecond response times for smooth interactions."
+        "title": "Real-Time Feeds",
+        "description": "Millisecond-latency on-chain data and execution."
       },
       "openSource": {
-        "title": "Open Source & Free",
-        "description": "Fully open source with 100k+ GitHub stars, community-driven continuous iteration."
+        "title": "Open Source",
+        "description": "Community-driven and transparent. Build the future of DeFi together."
+      }
+    },
+    "useCases": {
+      "title": "What Can You Build?",
+      "items": {
+        "whaleAlert": {
+          "title": "Auto-Alert Whale Movements",
+          "description": "Track specific addresses and get notified instantly on Telegram when they move funds."
+        },
+        "dipBuying": {
+          "title": "Rule-Based Dip Buying",
+          "description": "Set up automated buy orders when assets drop by a certain percentage."
+        },
+        "nodeMonitor": {
+          "title": "Node Health Monitor",
+          "description": "Receive alerts if your validator node goes offline or falls out of sync."
+        },
+        "memeSniper": {
+          "title": "Memecoin Sniper",
+          "description": "Detect new liquidity pools and execute buy orders faster than manual trading."
+        }
       }
     }
   },
   "howItWorks": {
     "title": "Four Steps",
-    "titleSuffix": "to Deploy Your AI Assistant",
+    "titleSuffix": "to Deploy Your Crypto Agent",
     "subtitle": "Simple installation process, complete deployment in minutes",
     "steps": {
       "install": {
         "title": "Install Manager",
-        "description": "Run npm command to globally install OpenClaw Manager with automatic environment setup."
+        "description": "Run npm command to globally install BlockClaw Manager with automatic environment setup."
       },
       "configure": {
-        "title": "Configure Connection",
-        "description": "Configure Discord Bot Token and AI model API Key in the Web interface."
+        "title": "Connect Wallet",
+        "description": "Securely import your view-only or signing keys. All data is encrypted locally."
       },
       "pairing": {
-        "title": "Pair & Verify",
-        "description": "Pair and verify with the Bot through Discord to authorize your account access."
+        "title": "Configure Skills",
+        "description": "Enable crypto skills like 'Price Monitor' or 'Sniper' and link your Telegram bot."
       },
       "start": {
-        "title": "Start Using",
-        "description": "After channel probing, your AI assistant is ready to start conversations anytime."
+        "title": "Start Trading",
+        "description": "Your AI agent is now active. Chat with it to execute trades and monitor the market."
       }
     }
   },

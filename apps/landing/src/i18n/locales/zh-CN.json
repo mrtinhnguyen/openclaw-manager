@@ -1,113 +1,134 @@
 {
   "nav": {
-    "features": "特性",
-    "howItWorks": "使用流程"
+    "features": "Features",
+    "howItWorks": "How It Works"
   },
   "hero": {
-    "title1": "图形化安装配置",
-    "title2": "OpenClaw",
-    "title3": "更简单",
-    "description": "OpenClaw Manager 让你一键部署 OpenClaw AI 助手。支持 Discord、WhatsApp、Telegram 等多平台，数据完全由你掌控。",
-    "installTitle": "推荐安装方式",
-    "copy": "复制",
-    "copied": "已复制",
+    "title1": "Deploy Your",
+    "title2": "Crypto AI Agent",
+    "title3": "In One Click",
+    "description": "BlockClaw Manager lets you automate trading, monitor on-chain activities, and manage wallets via chat apps. 100% local, secure, and under your control.",
+    "installTitle": "Recommended Install",
+    "copy": "Copy",
+    "copied": "Copied",
     "github": "GitHub"
   },
   "features": {
-    "title": "为什么选择",
-    "subtitle": "一款真正做事的 AI 助手，让你的智能助手触手可及",
+    "title": "Why Choose",
+    "subtitle": "The ultimate on-chain command center powered by AI",
     "items": {
       "localFirst": {
-        "title": "本地优先",
-        "description": "在你自己的设备上运行，数据完全由你控制，无需担心隐私泄露。"
+        "title": "Local & Secure",
+        "description": "Your keys never leave your machine. Full data sovereignty with local execution."
       },
       "multiChannel": {
-        "title": "多渠道支持",
-        "description": "支持 Discord、WhatsApp、Telegram、Slack 等主流通讯平台。"
+        "title": "Chat-Ops Ready",
+        "description": "Control your portfolio via Discord, Telegram, WhatsApp, and Slack."
       },
       "aiAssistant": {
-        "title": "AI 助手",
-        "description": "24/7 全天候 AI 助理，支持多种大语言模型，智能对话交互。"
+        "title": "AI Alpha Hunter",
+        "description": "24/7 market monitoring and sentiment analysis powered by advanced LLMs."
       },
       "secure": {
-        "title": "安全可靠",
-        "description": "端到端加密通信，开源代码可审计，确保数据和对话安全。"
+        "title": "Bank-Grade Security",
+        "description": "End-to-end encrypted communication. Open source and auditable."
       },
       "oneClickDeploy": {
-        "title": "一键部署",
-        "description": "简单的安装脚本，几分钟内完成部署，无需复杂的服务器配置。"
+        "title": "Instant Deploy",
+        "description": "Simple installation script. Be up and running in minutes."
       },
       "modelCompatible": {
-        "title": "模型兼容",
-        "description": "支持 OpenAI、Claude、国产大模型等多种 AI 提供商。"
+        "title": "Multi-Model Support",
+        "description": "Compatible with OpenAI, Claude, and specialized crypto LLMs."
       },
       "realtime": {
-        "title": "实时响应",
-        "description": "优化的推理引擎，毫秒级响应速度，流畅的交互体验。"
+        "title": "Real-Time Feeds",
+        "description": "Millisecond-latency on-chain data and execution."
       },
       "openSource": {
-        "title": "开源免费",
-        "description": "完全开源，GitHub 上超过 10 万 Star，社区驱动持续迭代。"
+        "title": "Open Source",
+        "description": "Community-driven and transparent. Build the future of DeFi together."
+      }
+    },
+    "useCases": {
+      "title": "What Can You Build?",
+      "items": {
+        "whaleAlert": {
+          "title": "Auto-Alert Whale Movements",
+          "description": "Track specific addresses and get notified instantly on Telegram when they move funds."
+        },
+        "dipBuying": {
+          "title": "Rule-Based Dip Buying",
+          "description": "Set up automated buy orders when assets drop by a certain percentage."
+        },
+        "nodeMonitor": {
+          "title": "Node Health Monitor",
+          "description": "Receive alerts if your validator node goes offline or falls out of sync."
+        },
+        "memeSniper": {
+          "title": "Memecoin Sniper",
+          "description": "Detect new liquidity pools and execute buy orders faster than manual trading."
+        }
       }
     }
   },
   "howItWorks": {
-    "title": "四步",
-    "titleSuffix": "部署你的 AI 助手",
-    "subtitle": "简单的安装流程，几分钟内即可完成部署",
+    "title": "Four Steps",
+    "titleSuffix": "to Deploy Your Crypto Agent",
+    "subtitle": "Simple installation process, complete deployment in minutes",
     "steps": {
       "install": {
-        "title": "安装 Manager",
-        "description": "运行 npm 命令全局安装 OpenClaw Manager，自动完成环境准备。"
+        "title": "Install Manager",
+        "description": "Run npm command to globally install BlockClaw Manager with automatic environment setup."
       },
       "configure": {
-        "title": "配置连接",
-        "description": "在 Web 界面中配置 Discord Bot Token 和 AI 模型 API Key。"
+        "title": "Connect Wallet",
+        "description": "Securely import your view-only or signing keys. All data is encrypted locally."
       },
       "pairing": {
-        "title": "配对验证",
-        "description": "通过 Discord 与 Bot 配对验证，授权你的账号访问权限。"
+        "title": "Configure Skills",
+        "description": "Enable crypto skills like 'Price Monitor' or 'Sniper' and link your Telegram bot."
       },
       "start": {
-        "title": "开始使用",
-        "description": "完成通道探测后，你的 AI 助手已就绪，随时开始对话。"
+        "title": "Start Trading",
+        "description": "Your AI agent is now active. Chat with it to execute trades and monitor the market."
       }
     }
   },
   "pricing": {
-    "title": "开源",
-    "titleHighlight": "免费",
-    "titleSuffix": "，自主可控",
-    "subtitle": "OpenClaw 完全开源免费，你可以自主部署，也可以选择未来的托管服务",
-    "comingSoon": "即将推出",
+    "title": "Open Source & ",
+    "titleHighlight": "Free",
+    "titleSuffix": ", Self-Hosted",
+    "subtitle": "OpenClaw is completely open source and free. You can self-host it or choose future managed services.",
+    "comingSoon": "Coming Soon",
     "plans": {
       "opensource": {
-        "name": "开源版",
-        "description": "完全免费，自主部署",
-        "price": "免费",
+        "name": "Open Source",
+        "description": "Completely free, self-hosted",
+        "price": "Free",
         "features": [
-          "本地部署运行",
-          "数据完全自主",
+          "Local deployment",
+          "Full data ownership",
           "Discord / WhatsApp / Telegram",
-          "支持多种 AI 模型",
-          "开源代码可审计",
-          "社区支持"
+          "Multiple AI model support",
+          "Auditable open source code",
+          "Community support"
         ],
-        "cta": "GitHub 下载"
+        "cta": "Download on GitHub"
       },
       "hosted": {
-        "name": "托管版",
-        "description": "即将推出，敬请期待",
-        "price": "即将推出",
+        "name": "Managed",
+        "description": "Coming soon, stay tuned",
+        "price": "Coming Soon",
         "features": [
-          "云端一键部署",
-          "自动更新维护",
-          "多平台同时接入",
-          "高级分析面板",
-          "优先技术支持",
-          "SLA 保障"
+          "One-click cloud deployment",
+          "Automatic updates & maintenance",
+          "Multi-platform integration",
+          "Advanced analytics dashboard",
+          "Priority technical support",
+          "SLA guarantee"
         ],
-        "cta": "预约体验"
+        "cta": "Join Waitlist"
       }
     }
   },

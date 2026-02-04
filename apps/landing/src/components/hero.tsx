@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 export function Hero() {
   const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
-  const installCommand = "npm i -g openclaw-manager\nopenclaw-manager start";
+  const installCommand = "npm i -g blockclaw-manager\nblockclaw-manager start";
 
   const handleCopy = () => {
     navigator.clipboard.writeText(installCommand);
@@ -73,8 +73,8 @@ export function Hero() {
               </button>
             </div>
             <div className="p-4 font-mono text-sm text-left space-y-1">
-              <div><span className="text-muted">$</span> <span className="text-ink">npm i -g openclaw-manager</span></div>
-              <div><span className="text-muted">$</span> <span className="text-ink">openclaw-manager start</span></div>
+              <div><span className="text-muted">$</span> <span className="text-ink">npm i -g blockclaw-manager</span></div>
+              <div><span className="text-muted">$</span> <span className="text-ink">blockclaw-manager start</span></div>
             </div>
           </div>
         </div>
@@ -82,7 +82,7 @@ export function Hero() {
         {/* CTA Button */}
         <div className="flex items-center justify-center animate-slide-up" style={{ animationDelay: "0.3s" }}>
           <a 
-            href="https://github.com/Peiiii/openclaw-manager"
+            href="https://github.com/mrtinhnguyen/openclaw-manager"
             target="_blank"
             rel="noopener noreferrer"
           >

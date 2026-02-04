@@ -63,7 +63,7 @@ export function Features() {
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-ink mb-4">
-            {t("features.title")} <span className="text-gradient">OpenClaw</span>
+            {t("features.title")} <span className="text-gradient">BlockClaw</span>
           </h2>
           <p className="text-muted text-lg max-w-2xl mx-auto">
             {t("features.subtitle")}

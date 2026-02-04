@@ -7,7 +7,8 @@ import {
   createDiscordPairingJob,
   createDiscordPairingWaitJob,
   createQuickstartJob,
-  createResourceDownloadJob
+  createResourceDownloadJob,
+  createCryptoSkillInstallJob
 } from "../services/jobs.service.js";
 import type { JobEvent } from "../lib/jobs.js";
 import type { QuickstartRequest } from "../services/quickstart.service.js";
@@ -57,6 +58,15 @@ export function createResourceDownloadJobHandler(deps: ApiDeps): Handler {
     const url = typeof body?.url === "string" ? body.url.trim() : undefined;
     const filename = typeof body?.filename === "string" ? body.filename.trim() : undefined;
     const jobId = createResourceDownloadJob(deps, { url, filename });
+    return c.json({ ok: true, jobId });
+  };
+}
+
+export function createCryptoSkillInstallJobHandler(deps: ApiDeps): Handler {
+  return async (c) => {
+    const body = await c.req.json().catch(() => null);
+    const skills = Array.isArray(body?.skills) ? body.skills : [];
+    const jobId = createCryptoSkillInstallJob(deps, skills);
     return c.json({ ok: true, jobId });
   };
 }

@@ -9,7 +9,8 @@ import {
   createJobStatusHandler,
   createJobStreamHandler,
   createQuickstartJobHandler,
-  createResourceDownloadJobHandler
+  createResourceDownloadJobHandler,
+  createCryptoSkillInstallJobHandler
 } from "../controllers/jobs.controller.js";
 
 export function registerJobRoutes(app: Hono, deps: ApiDeps) {
@@ -18,6 +19,7 @@ export function registerJobRoutes(app: Hono, deps: ApiDeps) {
   app.post("/api/jobs/discord/pairing", createDiscordPairingJobHandler(deps));
   app.post("/api/jobs/discord/pairing/wait", createDiscordPairingWaitJobHandler(deps));
   app.post("/api/jobs/resources/download", createResourceDownloadJobHandler(deps));
+  app.post("/api/jobs/crypto/install-skills", createCryptoSkillInstallJobHandler(deps));
   app.post("/api/jobs/ai/auth", createAiAuthJobHandler(deps));
   app.get("/api/jobs/:id", createJobStatusHandler(deps));
   app.get("/api/jobs/:id/stream", createJobStreamHandler(deps));

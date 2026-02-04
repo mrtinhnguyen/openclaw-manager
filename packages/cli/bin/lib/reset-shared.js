@@ -75,9 +75,9 @@ function resolveConfigDirs(flags) {
         return [path.dirname(explicitPath)];
     const home = os.homedir();
     if (isRootUser()) {
-        return ["/etc/openclaw-manager"];
+        return ["/etc/blockclaw-manager"];
     }
-    return [path.join(home, ".openclaw-manager")];
+    return [path.join(home, ".blockclaw-manager")];
 }
 function resolveInstallDirs(flags) {
     const explicit = normalizePath(flags.installDir) ?? normalizePath(process.env.MANAGER_INSTALL_DIR);
@@ -85,9 +85,9 @@ function resolveInstallDirs(flags) {
         return [explicit];
     const home = os.homedir();
     if (isRootUser()) {
-        return ["/opt/openclaw-manager"];
+        return ["/opt/blockclaw-manager"];
     }
-    return [path.join(home, "openclaw-manager")];
+    return [path.join(home, "blockclaw-manager")];
 }
 function resolveOpenclawDir() {
     const explicit = normalizePath(process.env.OPENCLAW_STATE_DIR);
@@ -107,7 +107,7 @@ function listSandboxDirs() {
     return entries
         .filter((entry) => {
         return (entry.isDirectory() &&
-            entry.name.startsWith("openclaw-manager-sandbox-"));
+            entry.name.startsWith("blockclaw-manager-sandbox-"));
     })
         .map((entry) => path.join(dir, entry.name));
 }
@@ -119,8 +119,8 @@ function isSafeResetPath(resolved) {
 }
 function isExpectedResetPath(resolved) {
     const normalized = resolved.replace(/\\/g, "/");
-    return (normalized.includes("/openclaw-manager") ||
-        normalized.includes("/.openclaw-manager") ||
+    return (normalized.includes("/blockclaw-manager") ||
+        normalized.includes("/.blockclaw-manager") ||
         normalized.includes("/.openclaw"));
 }
 function normalizePath(value) {

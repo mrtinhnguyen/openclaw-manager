@@ -106,9 +106,9 @@ function resolveConfigDirs(flags: ResetSharedFlags): string[] {
 
   const home = os.homedir();
   if (isRootUser()) {
-    return ["/etc/openclaw-manager"];
+    return ["/etc/blockclaw-manager"];
   }
-  return [path.join(home, ".openclaw-manager")];
+  return [path.join(home, ".blockclaw-manager")];
 }
 
 function resolveInstallDirs(flags: ResetSharedFlags): string[] {
@@ -116,9 +116,9 @@ function resolveInstallDirs(flags: ResetSharedFlags): string[] {
   if (explicit) return [explicit];
   const home = os.homedir();
   if (isRootUser()) {
-    return ["/opt/openclaw-manager"];
+    return ["/opt/blockclaw-manager"];
   }
-  return [path.join(home, "openclaw-manager")];
+  return [path.join(home, "blockclaw-manager")];
 }
 
 function resolveOpenclawDir(): string {
@@ -139,7 +139,7 @@ function listSandboxDirs(): string[] {
     .filter((entry) => {
       return (
         entry.isDirectory() &&
-        entry.name.startsWith("openclaw-manager-sandbox-")
+        entry.name.startsWith("blockclaw-manager-sandbox-")
       );
     })
     .map((entry) => path.join(dir, entry.name));
@@ -154,8 +154,8 @@ function isSafeResetPath(resolved: string): boolean {
 function isExpectedResetPath(resolved: string): boolean {
   const normalized = resolved.replace(/\\/g, "/");
   return (
-    normalized.includes("/openclaw-manager") ||
-    normalized.includes("/.openclaw-manager") ||
+    normalized.includes("/blockclaw-manager") ||
+    normalized.includes("/.blockclaw-manager") ||
     normalized.includes("/.openclaw")
   );
 }

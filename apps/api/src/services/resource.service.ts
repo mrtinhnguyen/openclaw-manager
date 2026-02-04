@@ -15,7 +15,7 @@ export async function downloadResource(options: DownloadOptions, onLog: (line: s
   const url = options.url.trim();
   if (!url) throw new Error("resource url missing");
 
-  const targetDir = options.dir ?? path.join(os.homedir(), ".clawdbot-manager", "resources");
+  const targetDir = options.dir ?? path.join(os.homedir(), ".blockclaw-manager", "resources");
   const safeName = options.filename?.trim() || path.basename(new URL(url).pathname) || "resource.bin";
   const targetPath = path.join(targetDir, safeName);
 

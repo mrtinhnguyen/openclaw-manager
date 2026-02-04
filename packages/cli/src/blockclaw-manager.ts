@@ -19,7 +19,7 @@ if (parsed.flags.help || cmd === "help") {
 }
 
 if (parsed.flags.version) {
-  console.log(`openclaw-manager ${readPackageVersion()}`);
+  console.log(`blockclaw-manager ${readPackageVersion()}`);
   process.exit(0);
 }
 

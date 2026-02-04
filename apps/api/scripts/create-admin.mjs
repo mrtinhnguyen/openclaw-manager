@@ -6,7 +6,7 @@ import path from "node:path";
 const args = process.argv.slice(2);
 const username = readArg("--username");
 const password = readArg("--password");
-const configPath = readArg("--config") ?? path.join(os.homedir(), ".clawdbot-manager", "config.json");
+const configPath = readArg("--config") ?? path.join(os.homedir(), ".blockclaw-manager", "config.json");
 
 if (!username || !password) {
   console.error("Usage: node create-admin.mjs --username <user> --password <pass> [--config <path>]");

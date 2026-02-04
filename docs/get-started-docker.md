@@ -1,65 +1,65 @@
-# Docker 快速开始
+# Docker Quick Start
 
-适用场景：希望用 Docker 快速启动并体验 OpenClaw Manager。
+Scenario: Quickly start and experience BlockClaw Manager using Docker.
 
-## 1) 一键启动
-
-```bash
-curl -fsSL https://openclaw-manager.com/docker.sh | bash
-```
-
-带账号密码：
+## 1) One-Click Start
 
 ```bash
-MANAGER_ADMIN_USER=admin MANAGER_ADMIN_PASS=pass curl -fsSL https://openclaw-manager.com/docker.sh | bash
+curl -fsSL https://blockclaw.app/docker.sh | bash
 ```
 
-手动指定公网地址（用于打印可访问链接）：
+With credentials:
 
 ```bash
-MANAGER_PUBLIC_HOST=<your-public-ip-or-domain> curl -fsSL https://openclaw-manager.com/docker.sh | bash
+MANAGER_ADMIN_USER=admin MANAGER_ADMIN_PASS=pass curl -fsSL https://blockclaw.app/docker.sh | bash
 ```
 
-延长网关启动超时（默认 60000ms）：
+Manually specify public address (for printing accessible links):
 
 ```bash
-MANAGER_GATEWAY_TIMEOUT_MS=60000 curl -fsSL https://openclaw-manager.com/docker.sh | bash
+MANAGER_PUBLIC_HOST=<your-public-ip-or-domain> curl -fsSL https://blockclaw.app/docker.sh | bash
 ```
 
-脚本会自动拉起容器并输出访问地址与登录信息。
+Extend gateway startup timeout (default 60000ms):
 
-## 2) 打开控制台
+```bash
+MANAGER_GATEWAY_TIMEOUT_MS=60000 curl -fsSL https://blockclaw.app/docker.sh | bash
+```
 
-- 本机访问：`http://127.0.0.1:17321/`
-- 远程访问：`http://<your-host>:17321/`
+The script will automatically pull the container and output the access URL and login information.
 
-如果是 VPS，请确保防火墙与安全组放行 `17321` 端口。  
-如需仅本机访问，可设置 `MANAGER_API_HOST=127.0.0.1`。  
-脚本会尝试探测公网 IP 并打印可访问链接，无法探测时可用 `MANAGER_PUBLIC_HOST` 指定。
+## 2) Open Console
 
-## 3) 登录并完成向导
+- Local access: `http://127.0.0.1:17321/`
+- Remote access: `http://<your-host>:17321/`
 
-使用脚本输出的管理员账号登录，然后按向导完成：
+If using a VPS, ensure firewall/security groups allow port `17321`.
+For local-only access, set `MANAGER_API_HOST=127.0.0.1`.
+The script will attempt to detect the public IP and print the accessible link; if detection fails, use `MANAGER_PUBLIC_HOST` to specify.
 
-1) CLI 安装  
-2) 启动网关  
-3) Discord Token  
-4) AI Provider  
-5) 配对  
-6) 探测
+## 3) Login and Complete Wizard
 
-## 4) 快速验证（可选）
+Log in using the admin account output by the script, then follow the wizard:
+
+1) CLI Installation
+2) Start Gateway
+3) Discord Token
+4) AI Provider
+5) Pairing
+6) Probing
+
+## 4) Quick Validation (Optional)
 
 ```bash
 curl -fsS http://<your-host>:17321/health
 curl -fsS -u admin:pass http://<your-host>:17321/api/status
 ```
 
-## 常用环境变量
+## Common Environment Variables
 
-- `MANAGER_DOCKER_NAME`：容器名称
-- `MANAGER_CONFIG_VOLUME`：配置卷名称
-- `MANAGER_API_PORT`：对外端口（默认 `17321`）
-- `MANAGER_ADMIN_USER` / `MANAGER_ADMIN_PASS`：管理员账号
-- `MANAGER_PUBLIC_HOST`：公网地址（用于打印可访问链接）
-- `MANAGER_GATEWAY_TIMEOUT_MS`：网关启动超时（毫秒）
+- `MANAGER_DOCKER_NAME`: Container name
+- `MANAGER_CONFIG_VOLUME`: Configuration volume name
+- `MANAGER_API_PORT`: Exposed port (Default `17321`)
+- `MANAGER_ADMIN_USER` / `MANAGER_ADMIN_PASS`: Admin account
+- `MANAGER_PUBLIC_HOST`: Public address (Used for printing accessible links)
+- `MANAGER_GATEWAY_TIMEOUT_MS`: Gateway startup timeout (milliseconds)

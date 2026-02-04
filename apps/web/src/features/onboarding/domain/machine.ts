@@ -20,6 +20,7 @@ export function syncOnboardingFlow(
     gatewayOk: context.gatewayOk,
     gatewayVerified: context.gatewayVerified,
     tokenConfirmed: context.tokenConfirmed,
+    cryptoConfigured: context.cryptoConfigured,
     aiConfirmed: context.aiConfirmed,
     pairingConfirmed: context.pairingConfirmed,
     probeConfirmed: context.probeConfirmed
@@ -90,6 +91,8 @@ export function isStepSatisfied(context: OnboardingContext, step: OnboardingStep
       return context.gatewayVerified || context.gatewayOk;
     case "token":
       return context.tokenConfirmed;
+    case "crypto":
+      return context.cryptoConfigured;
     case "ai":
       return context.aiConfirmed;
     case "pairing":

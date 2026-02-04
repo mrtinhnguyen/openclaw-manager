@@ -8,6 +8,7 @@ export type OnboardingContext = {
   gatewayVerified: boolean;
   tokenConfigured: boolean;
   tokenConfirmed: boolean;
+  cryptoConfigured: boolean;
   aiConfigured: boolean;
   aiConfirmed: boolean;
   aiMissingProviders: string[];
@@ -22,6 +23,7 @@ export type OnboardingContext = {
 export function deriveOnboardingContext(params: {
   status: StatusResponse | null;
   loading: boolean;
+  cryptoConfigured: boolean;
   events: {
     gatewayVerified: boolean;
     tokenConfirmed: boolean;
@@ -30,7 +32,7 @@ export function deriveOnboardingContext(params: {
     probeConfirmed: boolean;
   };
 }): OnboardingContext {
-  const { status, loading, events } = params;
+  const { status, loading, events, cryptoConfigured } = params;
   return {
     cliInstalled: Boolean(status?.cli.installed),
     cliVersion: status?.cli.version ?? null,
@@ -38,6 +40,7 @@ export function deriveOnboardingContext(params: {
     gatewayVerified: Boolean(events.gatewayVerified),
     tokenConfigured: Boolean(status?.onboarding?.discord.tokenConfigured),
     tokenConfirmed: events.tokenConfirmed,
+    cryptoConfigured,
     aiConfigured: Boolean(status?.onboarding?.ai?.configured),
     aiConfirmed: events.aiConfirmed,
     aiMissingProviders: status?.onboarding?.ai?.missingProviders ?? [],

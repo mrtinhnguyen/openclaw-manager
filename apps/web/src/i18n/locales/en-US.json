@@ -1,7 +1,7 @@
 {
   "app": {
-    "name": "OpenClaw Manager",
-    "subtitle": "Quick Setup Wizard"
+    "name": "BlockClaw Manager",
+    "subtitle": "Crypto AI Agent Deployer"
   },
   "common": {
     "continue": "Continue",
@@ -110,6 +110,17 @@
     "placeholder": "Paste Bot Token...",
     "howToGet": "How to get Token?",
     "enterHint": "Press Enter to continue"
+  },
+  "crypto": {
+    "title": "Blockchain Configuration",
+    "subtitle": "Select your chain and configure wallet settings",
+    "chainSelect": "Select Chain",
+    "testnetWarning": "Defaulting to Testnet for safety",
+    "rpcUrl": "RPC Endpoint (Optional)",
+    "walletSetup": "Wallet Setup",
+    "walletDesc": "Paste your view-only address or private key (encrypted locally)",
+    "keysStoredLocally": "Keys are stored locally and never transmitted",
+    "installSkills": "Install Crypto Skills"
   },
   "ai": {
     "title": "Configure AI Capabilities",

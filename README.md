@@ -1,13 +1,41 @@
-# OpenClaw Manager
+# BlockClaw Manager
 
-[![npm version](https://img.shields.io/npm/v/openclaw-manager.svg)](https://www.npmjs.com/package/openclaw-manager)
+[![npm version](https://img.shields.io/npm/v/blockclaw-manager.svg)](https://www.npmjs.com/package/blockclaw-manager)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> OpenClaw installation and configuration tool. Complete installation, configuration, and pairing locally in one place.
+> **One-click deploy your crypto AI agent – automate trading, monitor on-chain, manage wallets via chat apps, 100% local & secure.**
 
-![OpenClaw Manager Screenshot](images/screenshots/openclaw-manager-en.png)
+![BlockClaw Manager Screenshot](images/screenshots/blockclaw-manager-en.png)
 
-[中文文档](README.zh-CN.md)
+---
+
+## ⚠️ Disclaimer
+
+**Not Financial Advice.** BlockClaw is a tool for interacting with blockchain networks and managing digital assets. You are solely responsible for your private keys, funds, and trading decisions. The software is provided "AS IS" without warranty of any kind.
+
+---
+
+## Features
+
+- **🚀 One-Click Crypto Agent**: Deploy a fully autonomous AI agent in minutes.
+- **🔐 100% Local & Secure**: Your keys, your data. Runs entirely on your machine.
+- **💬 Chat-Ops for DeFi**: Manage wallets, check balances, and execute swaps via Discord, Telegram, or WhatsApp.
+- **⚡ Memecoin Sniping**: Auto-detect new pools and snipe entries based on your rules.
+- **📡 Node Monitoring**: Real-time health checks for your RPC nodes and validators.
+- **🧠 AI-Powered Insights**: Integrated with LLMs to analyze market sentiment and on-chain data.
+- **🔌 Multi-Chain Support**: Ready for Ethereum, Solana, Base, and more.
+
+---
+
+## Screenshots
+
+*(Screenshots coming soon)*
+
+---
+
+## Contributing
+
+Contributions are welcome! Please check out our [contribution guidelines](CONTRIBUTING.md) to get started.
 
 ---
 
@@ -16,94 +44,30 @@
 ### NPM (Recommended)
 
 ```bash
-npm i -g openclaw-manager
-openclaw-manager start
+npm i -g blockclaw-manager
+blockclaw-manager start
 ```
 
-Common commands:
-
-- `openclaw-manager stop` - Stop the service
-- `openclaw-manager stop-all` - Stop all instances
-- `openclaw-manager reset` - Reset configuration
-
-Specify admin credentials on first start:
+### Docker
 
 ```bash
-openclaw-manager start --user admin --pass pass
+curl -fsSL https://blockclaw.app/docker.sh | bash
 ```
-
-### Script Installation
-
-**Mac / Linux**
-
-```bash
-curl -fsSL https://openclaw-manager.com/install.sh | bash
-```
-
-The installation process will prompt you to set an admin username and password.
-
-**Windows** (Not yet verified, use with caution)
-
-```powershell
-irm https://openclaw-manager.com/install.ps1 | iex
-```
-
-**Docker**
-
-```bash
-curl -fsSL https://openclaw-manager.com/docker.sh | bash
-```
-
-For more Docker parameters and instructions:
-- [docs/get-started-docker.md](docs/get-started-docker.md)
-- [docs/docker.md](docs/docker.md)
 
 ---
 
 ## Usage
 
-1. Run the installation command → Manager service starts automatically
-2. Open browser and visit `http://localhost:17321`
-3. Log in with the username and password set during installation
-4. Follow the guide to install OpenClaw CLI (npm package `openclaw`)
-5. Configure Discord Bot Token
-6. Configure AI model (API Key)
-7. Pair with your Bot
-8. Done! Start using
-
----
-
-## Features
-
-- 🚀 **One-click deployment** - Get your AI assistant running in minutes
-- 🖥️ **Web UI** - Intuitive configuration interface
-- 🔒 **Local-first** - Your data stays on your device
-- 🤖 **Multi-platform** - Discord, WhatsApp, Telegram support
-- 🧠 **AI models** - OpenAI, Claude, and more
-
----
-
-## Documentation
-
-- [Getting Started Guide](docs/getting-started.md)
-- [Docker Deployment](docs/docker.md)
-- [Configuration Reference](docs/configuration.md)
-
----
-
-## Community
-
-- GitHub: [https://github.com/Peiiii/openclaw-manager](https://github.com/Peiiii/openclaw-manager)
-- Issues: [Report bugs or request features](https://github.com/Peiiii/openclaw-manager/issues)
+1. Run the start command → BlockClaw Manager launches.
+2. Open `http://localhost:17321` in your browser.
+3. Follow the **Crypto Setup Wizard**:
+   - **Connect Node**: RPC endpoints (Infura/Alchemy/Local).
+   - **Wallet Setup**: Import view-only or signing keys (encrypted locally).
+   - **Bot Integration**: Link your Discord/Telegram bot.
+   - **AI Config**: Set up your strategic command center.
 
 ---
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details.
-
----
-
-## Related Projects
-
-- [OpenClaw](https://github.com/Peiiii/openclaw) - The AI assistant framework
+MIT © BlockClaw

@@ -21,11 +21,12 @@ export type JobsState = {
   pairing: JobState<{ code?: string }>;
   resource: JobState<{ path?: string }>;
   aiAuth: JobState<{ provider?: string }>;
+  cryptoSkills: JobState<{ installed?: string[] }>;
   updateJob: (jobKey: JobKey, updater: (job: JobState) => JobState) => void;
   resetJob: (jobKey: JobKey) => void;
 };
 
-export type JobKey = "cli" | "quickstart" | "pairing" | "resource" | "aiAuth";
+export type JobKey = "cli" | "quickstart" | "pairing" | "resource" | "aiAuth" | "cryptoSkills";
 
 const emptyJob = <T,>(): JobState<T> => ({
   jobId: null,
@@ -41,6 +42,7 @@ export const useJobsStore = create<JobsState>((set) => ({
   pairing: emptyJob(),
   resource: emptyJob(),
   aiAuth: emptyJob(),
+  cryptoSkills: emptyJob(),
   updateJob: (jobKey, updater) =>
     set((state) => ({
       ...state,

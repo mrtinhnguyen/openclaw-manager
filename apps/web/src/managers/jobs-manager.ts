@@ -62,6 +62,14 @@ export class JobsManager {
       withResult: true
     });
 
+  startCryptoSkillInstallJob = async (skills: string[]) =>
+    this.runJob({
+      jobKey: "cryptoSkills",
+      endpoint: "/api/jobs/crypto/install-skills",
+      payload: { skills },
+      withResult: true
+    });
+
   private runJob = async (options: RunJobOptions): Promise<{ ok: boolean; error?: string }> => {
     const jobsStore = useJobsStore.getState();
     jobsStore.updateJob(options.jobKey, (job) => ({

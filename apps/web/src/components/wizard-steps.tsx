@@ -2,6 +2,7 @@ import { ArrowRight, Check, ExternalLink, Loader2, Lock, MessageCircle, Search, 
 import { useTranslation } from "react-i18next";
 
 import { JobLogPanel } from "@/components/job-log-panel";
+import { DashboardPanel } from "@/components/dashboard/dashboard-widgets";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -659,6 +660,8 @@ export function CompleteStep({
                 <h2 className="text-2xl font-semibold text-success">🎉 {t("complete.title")}</h2>
                 <p className="mt-2 text-sm text-muted">{t("complete.subtitle")}</p>
             </div>
+
+            <DashboardPanel />
 
             <div className="space-y-3 rounded-2xl bg-line/20 p-4 text-left">
                 <div className="flex items-center justify-between text-sm">

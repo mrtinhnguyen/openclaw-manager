@@ -1,25 +1,25 @@
-# 发布部署
+# Deployment
 
-本指南面向维护者，描述如何发布 Cloudflare Pages。
+This guide is for maintainers, describing how to deploy Cloudflare Pages.
 
-## 前置条件
+## Prerequisites
 
-- 已安装依赖：`pnpm install`
-- 已准备 Cloudflare API Token（非交互环境需要）
+- Dependencies installed: `pnpm install`
+- Cloudflare API Token prepared (required for non-interactive environments)
 
-## 发布到 Pages
+## Deploy to Pages
 
 ```bash
 pnpm deploy:pages
 ```
 
-可选环境变量：
+Optional Environment Variables:
 
-- `CLOUDFLARE_API_TOKEN`：Cloudflare API Token（必需于非交互环境）
-- `CLOUDFLARE_PAGES_PROJECT`：项目名（默认 `clawdbot-manager`）
-- `CLOUDFLARE_PAGES_BRANCH`：分支名（默认 `main`）
+- `CLOUDFLARE_API_TOKEN`: Cloudflare API Token (Required in non-interactive environments)
+- `CLOUDFLARE_PAGES_PROJECT`: Project name (Default `blockclaw-manager`)
+- `CLOUDFLARE_PAGES_BRANCH`: Branch name (Default `main`)
 
-## 线上冒烟验证
+## Online Smoke Test
 
 ```bash
 curl -fsS https://<project>.pages.dev

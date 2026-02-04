@@ -1,6 +1,10 @@
 {
-  "name": "@clawdbot-manager/shared",
+  "name": "@blockclaw-manager/shared",
   "private": true,
   "type": "module",
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  }
 }

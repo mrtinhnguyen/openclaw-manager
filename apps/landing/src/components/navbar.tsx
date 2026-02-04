@@ -36,7 +36,7 @@ export function Navbar() {
             <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
               <Bot className="w-5 h-5 text-white" />
             </div>
-            <span className="text-lg font-semibold text-ink">OpenClaw Manager</span>
+            <span className="text-lg font-semibold text-ink">BlockClaw Manager</span>
           </a>
 
           {/* Desktop Navigation */}
@@ -56,7 +56,7 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-4">
             <LanguageSwitcher />
             <a 
-              href="https://github.com/Peiiii/openclaw-manager" 
+              href="https://github.com/mrtinhnguyen/openclaw-manager" 
               target="_blank" 
               rel="noopener noreferrer"
               className="p-2 text-muted hover:text-ink transition-colors"

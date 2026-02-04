@@ -13,15 +13,15 @@ export function resolveConfigPaths(flags) {
         configDir = path.dirname(configPath);
     }
     if (!configDir) {
-        configDir = path.join(os.homedir(), ".openclaw-manager");
+        configDir = path.join(os.homedir(), ".blockclaw-manager");
     }
     if (!configPath) {
         configPath = path.join(configDir, "config.json");
     }
-    const logPath = flags.logPath ?? process.env.MANAGER_LOG_PATH ?? path.join(configDir, "openclaw-manager.log");
+    const logPath = flags.logPath ?? process.env.MANAGER_LOG_PATH ?? path.join(configDir, "blockclaw-manager.log");
     const errorLogPath = flags.errorLogPath ??
         process.env.MANAGER_ERROR_LOG_PATH ??
-        path.join(configDir, "openclaw-manager.error.log");
+        path.join(configDir, "blockclaw-manager.error.log");
     return {
         apiPort,
         apiHost,
@@ -67,5 +67,5 @@ export function resolveConfigDirCandidates(flags) {
     const explicit = flags.configDir ?? process.env.MANAGER_CONFIG_DIR;
     if (explicit)
         return [explicit];
-    return [path.join(os.homedir(), ".openclaw-manager")];
+    return [path.join(os.homedir(), ".blockclaw-manager")];
 }

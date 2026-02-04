@@ -4,6 +4,7 @@ import { runCommandWithLogs } from "../lib/runner.js";
 import { parsePositiveInt, sleep } from "../lib/utils.js";
 import { runQuickstart, type QuickstartRequest } from "./quickstart.service.js";
 import { downloadResource, type DownloadOptions } from "./resource.service.js";
+import { installCryptoSkills } from "./crypto.service.js";
 
 const MINIMAX_CN_BASE_URL = "https://api.minimaxi.com/anthropic";
 const DEFAULT_PAIRING_WAIT_TIMEOUT_MS = 180_000;
@@ -205,6 +206,25 @@ export function createResourceDownloadJob(
       deps.jobStore.appendLog(job.id, `Download failed: ${message}`);
       deps.jobStore.failJob(job.id, message);
     });
+
+  return job.id;
+}
+
+export function createCryptoSkillInstallJob(deps: ApiDeps, skills: string[]) {
+  const job = deps.jobStore.createJob("Crypto Skill Install");
+  deps.jobStore.startJob(job.id);
+  deps.jobStore.appendLog(job.id, "Starting crypto skill installation...");
+
+  void (async () => {
+    try {
+      const result = await installCryptoSkills(skills, (line) => deps.jobStore.appendLog(job.id, line));
+      deps.jobStore.completeJob(job.id, result);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      deps.jobStore.appendLog(job.id, `Installation failed: ${message}`);
+      deps.jobStore.failJob(job.id, message);
+    }
+  })();
 
   return job.id;
 }

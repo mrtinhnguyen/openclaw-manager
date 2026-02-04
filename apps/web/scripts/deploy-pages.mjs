@@ -1,7 +1,7 @@
 import { spawnSync } from "node:child_process";
 import process from "node:process";
 
-const project = process.env.CLOUDFLARE_PAGES_PROJECT ?? "clawdbot-manager";
+const project = process.env.CLOUDFLARE_PAGES_PROJECT ?? "blockclaw-app-web";
 const branch = process.env.CLOUDFLARE_PAGES_BRANCH ?? "main";
 
 const result = spawnSync(

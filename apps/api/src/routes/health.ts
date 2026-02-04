@@ -5,7 +5,7 @@ export function registerHealthRoutes(app: Hono) {
     return c.json({
       ok: true,
       time: new Date().toISOString(),
-      version: "clawdbot-manager-api"
+      version: "blockclaw-manager-api"
     });
   });
 }

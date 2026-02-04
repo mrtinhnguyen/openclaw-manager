@@ -10,7 +10,7 @@ const targetApi = path.join(pkgDir, "dist");
 const targetWeb = path.join(pkgDir, "web-dist");
 
 if (!fs.existsSync(apiDist) || !fs.existsSync(webDist)) {
-  console.error("[build-openclaw-manager] Missing build artifacts. Run pnpm build first.");
+  console.error("[build-blockclaw-manager] Missing build artifacts. Run pnpm build first.");
   process.exit(1);
 }
 
@@ -20,4 +20,4 @@ fs.rmSync(targetWeb, { recursive: true, force: true });
 fs.cpSync(apiDist, targetApi, { recursive: true });
 fs.cpSync(webDist, targetWeb, { recursive: true });
 
-console.log("[build-openclaw-manager] Copied api dist and web dist into package.");
+console.log("[build-blockclaw-manager] Copied api dist and web dist into package.");

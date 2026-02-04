@@ -4,15 +4,15 @@ set -euo pipefail
 MANAGER_API_PORT="${MANAGER_API_PORT:-17321}"
 
 if [[ "${EUID:-$(id -u)}" -eq 0 ]]; then
-  CONFIG_DIR="${MANAGER_CONFIG_DIR:-/etc/clawdbot-manager}"
-  INSTALL_DIR="${MANAGER_INSTALL_DIR:-/opt/clawdbot-manager}"
+  CONFIG_DIR="${MANAGER_CONFIG_DIR:-/etc/blockclaw-manager}"
+  INSTALL_DIR="${MANAGER_INSTALL_DIR:-/opt/blockclaw-manager}"
 else
-  CONFIG_DIR="${MANAGER_CONFIG_DIR:-$HOME/.clawdbot-manager}"
-  INSTALL_DIR="${MANAGER_INSTALL_DIR:-$HOME/clawdbot-manager}"
+  CONFIG_DIR="${MANAGER_CONFIG_DIR:-$HOME/.blockclaw-manager}"
+  INSTALL_DIR="${MANAGER_INSTALL_DIR:-$HOME/blockclaw-manager}"
 fi
 
 PID_FILE="$CONFIG_DIR/manager.pid"
-SERVICE_NAME="clawdbot-manager"
+SERVICE_NAME="blockclaw-manager"
 
 if command -v systemctl >/dev/null 2>&1 && [[ -f "/etc/systemd/system/${SERVICE_NAME}.service" ]]; then
   systemctl stop "$SERVICE_NAME"

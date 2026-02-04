@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-DEFAULT_REPO_URL="https://github.com/Peiiii/openclaw-manager.git"
+DEFAULT_REPO_URL="https://github.com/mrtinhnguyen/openclaw-manager.git"
 REPO_URL="${MANAGER_REPO_URL:-$DEFAULT_REPO_URL}"
 MANAGER_API_PORT="${MANAGER_API_PORT:-17321}"
 MANAGER_API_HOST="${MANAGER_API_HOST:-0.0.0.0}"
@@ -136,11 +136,11 @@ if ! command -v pnpm >/dev/null 2>&1; then
 fi
 
 if [[ "${EUID:-$(id -u)}" -eq 0 ]]; then
-  INSTALL_DIR="${MANAGER_INSTALL_DIR:-/opt/clawdbot-manager}"
-  CONFIG_DIR="${MANAGER_CONFIG_DIR:-/etc/clawdbot-manager}"
+  INSTALL_DIR="${MANAGER_INSTALL_DIR:-/opt/blockclaw-manager}"
+  CONFIG_DIR="${MANAGER_CONFIG_DIR:-/etc/blockclaw-manager}"
 else
-  INSTALL_DIR="${MANAGER_INSTALL_DIR:-$HOME/clawdbot-manager}"
-  CONFIG_DIR="${MANAGER_CONFIG_DIR:-$HOME/.clawdbot-manager}"
+  INSTALL_DIR="${MANAGER_INSTALL_DIR:-$HOME/blockclaw-manager}"
+  CONFIG_DIR="${MANAGER_CONFIG_DIR:-$HOME/.blockclaw-manager}"
 fi
 
 if [[ -d "$INSTALL_DIR/.git" ]]; then
@@ -202,10 +202,10 @@ node apps/api/scripts/create-admin.mjs \
   --config "$CONFIG_DIR/config.json"
 
 if command -v systemctl >/dev/null 2>&1 && [[ "${EUID:-$(id -u)}" -eq 0 ]]; then
-  SERVICE_PATH="/etc/systemd/system/clawdbot-manager.service"
+  SERVICE_PATH="/etc/systemd/system/blockclaw-manager.service"
   cat > "$SERVICE_PATH" <<SERVICE
 [Unit]
-Description=OpenClaw Manager API
+Description=BlockClaw Manager API
 After=network.target
 
 [Service]
@@ -224,10 +224,10 @@ WantedBy=multi-user.target
 SERVICE
 
   systemctl daemon-reload
-  systemctl enable --now clawdbot-manager
+  systemctl enable --now blockclaw-manager
   echo "[manager] Service started."
 else
-  LOG_PATH="${MANAGER_LOG_PATH:-/tmp/clawdbot-manager.log}"
+  LOG_PATH="${MANAGER_LOG_PATH:-/tmp/blockclaw-manager.log}"
   PID_FILE="$CONFIG_DIR/manager.pid"
   nohup env \
     MANAGER_API_HOST="$MANAGER_API_HOST" \

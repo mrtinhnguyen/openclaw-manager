@@ -27,7 +27,7 @@ async function loadResetShared() {
   } catch (err) {
     const detail = err instanceof Error ? err.message : String(err);
     throw new Error(
-      `reset shared module missing. Run "pnpm --filter openclaw-manager build" before reset. (${detail})`
+      `reset shared module missing. Run "pnpm --filter blockclaw-manager build" before reset. (${detail})`
     );
   }
 }
@@ -199,9 +199,9 @@ try {
     const auth = await resolveAuthHeader({ flags, config, nonInteractive });
     const continueAfter = Boolean(flags.continue || flags["run-probe"]);
     const code = await promptForValue({
-      message: "请输入配对码并回车确认（留空取消）：",
-      normalize: (value) => value.toUpperCase()
-    });
+    message: "Please enter the pairing code and press Enter (leave empty to cancel): ",
+    normalize: (value) => value.toUpperCase()
+  });
     if (!code) throw new Error("missing pairing code");
     await runJob(`${apiBase}/api/jobs/discord/pairing`, { code }, auth);
     if (continueAfter) {
@@ -352,14 +352,14 @@ async function resolveAuthHeader(params) {
     ? base.user
     : await resolveRequiredString({
         value: "",
-        message: "管理员用户名",
+        message: "Admin username",
         nonInteractive: params.nonInteractive
       });
   const pass = base.pass
     ? base.pass
     : await resolveRequiredString({
         value: "",
-        message: "管理员密码",
+        message: "Admin password",
         nonInteractive: params.nonInteractive
       });
   return buildBasicAuth(user, pass);
@@ -371,14 +371,14 @@ async function resolveAdminCredentialsInteractive(params) {
     ? base.user
     : await resolveRequiredString({
         value: "",
-        message: "管理员用户名",
+        message: "Admin username",
         nonInteractive: params.nonInteractive
       });
   const pass = base.pass
     ? base.pass
     : await resolveRequiredString({
         value: "",
-        message: "管理员密码",
+        message: "Admin password",
         nonInteractive: params.nonInteractive
       });
   return { user, pass };
@@ -443,7 +443,7 @@ async function resolveRequiredString(params) {
     throw new Error(`missing ${params.message}`);
   }
   const input = await promptForValue({
-    message: `${params.message}：`,
+    message: `${params.message}: `,
     normalize: (value) => value
   });
   const normalized = input.trim();
@@ -467,10 +467,10 @@ async function resolvePairingCode(params) {
     throw new Error("missing --code (or pairing.codes in config)");
   }
   const hint = Array.isArray(params.config?.pairing?.codes)
-    ? `候选：${params.config.pairing.codes.join(", ")}`
+    ? ` (Candidate: ${params.config.pairing.codes.join(", ")})`
     : "";
   const code = await promptForValue({
-    message: `请输入配对码并回车确认（留空取消）${hint ? `（${hint}）` : ""}：`,
+    message: `Please enter the pairing code and press Enter (leave empty to cancel)${hint}: `,
     normalize: (value) => value.toUpperCase()
   });
   if (!code) throw new Error("missing pairing code");
@@ -592,7 +592,7 @@ function formatError(err) {
 }
 
 function printHelp() {
-  console.log(`openclaw-manager CLI
+  console.log(`blockclaw-manager CLI
 
 Usage:
   node scripts/manager-cli.mjs <command> [--flags]
@@ -879,7 +879,7 @@ function listSandboxInstances() {
     return [];
   }
   return entries
-    .filter((entry) => entry.isDirectory() && entry.name.startsWith("openclaw-manager-sandbox-"))
+    .filter((entry) => entry.isDirectory() && entry.name.startsWith("blockclaw-manager-sandbox-"))
     .map((entry) => {
       const rootDir = path.join(dir, entry.name);
       const metaPath = path.join(rootDir, "sandbox.json");
@@ -1186,9 +1186,9 @@ function getListeningPids(ports) {
 
 function readSystemdStatus() {
   if (process.platform !== "linux") return "";
-  const servicePath = "/etc/systemd/system/clawdbot-manager.service";
+  const servicePath = "/etc/systemd/system/blockclaw-manager.service";
   if (!fs.existsSync(servicePath)) return "";
-  const result = spawnSync("systemctl", ["is-active", "clawdbot-manager"], {
+  const result = spawnSync("systemctl", ["is-active", "blockclaw-manager"], {
     encoding: "utf-8"
   });
   if (result.error || result.status !== 0) return "inactive";
@@ -1251,7 +1251,7 @@ async function createSandbox(params) {
       if (!allowBuild) {
         throw new Error(`api entry not found: ${apiEntry} (run pnpm build or use --build)`);
       }
-      const buildResult = spawnSync("pnpm", ["--filter", "clawdbot-manager-api", "build"], {
+      const buildResult = spawnSync("pnpm", ["--filter", "blockclaw-manager-api", "build"], {
         cwd: repoRoot,
         stdio: "inherit"
       });
@@ -1393,7 +1393,7 @@ function resolveRepoRoot() {
       try {
         const raw = fs.readFileSync(candidate, "utf-8");
         const parsed = JSON.parse(raw);
-        if (parsed?.name === "clawdbot-manager") {
+        if (parsed?.name === "blockclaw-manager") {
           return current;
         }
       } catch {
@@ -1652,14 +1652,14 @@ function resolveConfigDir(flags) {
   const value = flags["config-dir"] ?? process.env.MANAGER_CONFIG_DIR;
   if (typeof value === "string" && value.trim()) return value.trim();
   const isRoot = typeof process.getuid === "function" && process.getuid() === 0;
-  return isRoot ? "/etc/clawdbot-manager" : path.join(os.homedir(), ".clawdbot-manager");
+  return isRoot ? "/etc/blockclaw-manager" : path.join(os.homedir(), ".blockclaw-manager");
 }
 
 function resolveInstallDir(flags) {
   const value = flags["install-dir"] ?? process.env.MANAGER_INSTALL_DIR;
   if (typeof value === "string" && value.trim()) return value.trim();
   const isRoot = typeof process.getuid === "function" && process.getuid() === 0;
-  return isRoot ? "/opt/clawdbot-manager" : path.join(os.homedir(), "clawdbot-manager");
+  return isRoot ? "/opt/blockclaw-manager" : path.join(os.homedir(), "blockclaw-manager");
 }
 
 function resolvePidFile(flags, configDir) {
@@ -1675,9 +1675,9 @@ function resolveApiPort(flags) {
 
 function trySystemdStop() {
   if (process.platform !== "linux") return false;
-  const servicePath = "/etc/systemd/system/clawdbot-manager.service";
+  const servicePath = "/etc/systemd/system/blockclaw-manager.service";
   if (!fs.existsSync(servicePath)) return false;
-  const result = spawnSync("systemctl", ["stop", "clawdbot-manager"], { stdio: "ignore" });
+  const result = spawnSync("systemctl", ["stop", "blockclaw-manager"], { stdio: "ignore" });
   return result.status === 0 && !result.error;
 }
 

@@ -2,19 +2,21 @@ export type OnboardingStep =
   | "cli"
   | "gateway"
   | "token"
+  | "crypto"
   | "ai"
   | "pairing"
   | "probe"
   | "complete";
 
 export const ONBOARDING_STEPS = [
-  { id: "cli", label: "安装 CLI", description: "准备运行环境" },
-  { id: "gateway", label: "验证网关", description: "确认本地服务可用" },
-  { id: "token", label: "配置 Token", description: "连接 Discord Bot" },
-  { id: "ai", label: "配置 AI", description: "启用模型能力" },
-  { id: "pairing", label: "配对验证", description: "授权用户访问" },
-  { id: "probe", label: "通道探测", description: "验证通道连接" },
-  { id: "complete", label: "开始使用", description: "一切就绪" }
+  { id: "cli", label: "Install CLI", description: "Prepare runtime environment" },
+  { id: "gateway", label: "Verify Gateway", description: "Confirm local service is available" },
+  { id: "token", label: "Configure Token", description: "Connect Discord Bot" },
+  { id: "crypto", label: "Crypto Setup", description: "Chain & Wallet" },
+  { id: "ai", label: "Configure AI", description: "Enable model capabilities" },
+  { id: "pairing", label: "Pairing Verification", description: "Authorize user access" },
+  { id: "probe", label: "Channel Probe", description: "Verify channel connection" },
+  { id: "complete", label: "Start Using", description: "Everything is ready" }
 ] as const satisfies readonly {
   id: OnboardingStep;
   label: string;
@@ -32,6 +34,10 @@ export function getOnboardingStepMeta(step: OnboardingStep) {
   return stepMeta.get(step) ?? { id: step, label: step, description: "" };
 }
 
+// We need to import the store to check if configured
+// But imports here might cause circular deps if not careful.
+// Let's assume we pass a 'cryptoConfigured' param.
+
 export function resolveNextStep(params: {
   cliInstalled: boolean;
   gatewayOk: boolean;
@@ -40,6 +46,7 @@ export function resolveNextStep(params: {
   aiConfirmed: boolean;
   pairingConfirmed: boolean;
   probeConfirmed: boolean;
+  cryptoConfigured: boolean; // Added this
 }): OnboardingStep {
   const {
     cliInstalled,
@@ -48,14 +55,18 @@ export function resolveNextStep(params: {
     tokenConfirmed,
     aiConfirmed,
     pairingConfirmed,
-    probeConfirmed
+    probeConfirmed,
+    cryptoConfigured
   } = params;
   const gatewayReady = gatewayOk || gatewayVerified;
+  
   if (!cliInstalled) return "cli";
   if (probeConfirmed) return "complete";
-  if (gatewayReady && tokenConfirmed && !aiConfirmed) return "ai";
-  if (gatewayReady && tokenConfirmed && aiConfirmed && pairingConfirmed) return "probe";
-  if (gatewayReady && tokenConfirmed && aiConfirmed) return "pairing";
-  if (gatewayReady) return "token";
+  if (gatewayReady && tokenConfirmed && cryptoConfigured && !aiConfirmed) return "ai";
+  if (gatewayReady && tokenConfirmed && cryptoConfigured && aiConfirmed && pairingConfirmed) return "probe";
+  if (gatewayReady && tokenConfirmed && cryptoConfigured && aiConfirmed) return "pairing";
+  if (gatewayReady && tokenConfirmed && !cryptoConfigured) return "crypto";
+  if (gatewayReady && !tokenConfirmed) return "token";
+  if (gatewayReady) return "token"; // Default fallback
   return "gateway";
 }

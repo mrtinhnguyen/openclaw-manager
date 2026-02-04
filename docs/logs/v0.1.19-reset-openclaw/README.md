@@ -1,23 +1,23 @@
-# 2026-02-01 reset 同时清理 .openclaw
+# 2026-02-01 Reset also cleans .openclaw
 
-## 背景 / 问题
+## Background / Problem
 
-- 执行 `manager:reset` 后，OpenClaw 的配对/allowlist 数据仍保留在 `~/.openclaw`，导致无需配对即可使用。
+- After executing `manager:reset`, OpenClaw's pairing/allowlist data remains in `~/.openclaw`, allowing use without re-pairing.
 
-## 决策
+## Decisions
 
-- `reset` 目标新增 `~/.openclaw`（或 `OPENCLAW_STATE_DIR`），确保彻底清理配对状态。
-- 保持安全检查机制，避免误删非预期路径。
+- Add `~/.openclaw` (or `OPENCLAW_STATE_DIR`) to `reset` targets to ensure thorough cleanup of pairing state.
+- Maintain safety check mechanism to avoid accidental deletion of unintended paths.
 
-## 变更内容
+## Changes
 
-- 用户可见变化
-  - `manager:reset` 会清理 `~/.openclaw`（OpenClaw 状态目录）。
+- User-visible changes
+  - `manager:reset` will clean `~/.openclaw` (OpenClaw state directory).
 
-- 关键实现点
-  - `packages/cli/src/lib/reset-shared.ts`：新增 openclaw 清理目标与安全白名单。
+- Key implementation points
+  - `packages/cli/src/lib/reset-shared.ts`: Add openclaw cleanup target and safety whitelist.
 
-## 验证（怎么确认符合预期）
+## Verification (How to confirm expectations)
 
 ```bash
 # build / lint / typecheck
@@ -25,22 +25,22 @@ pnpm build
 pnpm lint
 pnpm -r --if-present tsc
 
-# smoke-check（非仓库目录）
+# smoke-check (non-repo directory)
 TMP_DIR=$(mktemp -d)
 cd "$TMP_DIR"
 openclaw-manager reset --dry-run
 ```
 
-验收点：
+Acceptance Points:
 
-- build/lint/tsc 全部通过。
-- dry-run 输出包含 `openclaw` 目标路径。
+- build/lint/tsc all pass.
+- dry-run output contains `openclaw` target path.
 
-## 发布 / 部署
+## Release / Deployment
 
-- 如需发布 npm，按 `docs/workflows/npm-release-process.md` 执行。
+- If npm publish is needed, execute according to `docs/workflows/npm-release-process.md`.
 
-## 影响范围 / 风险
+## Impact / Risks
 
-- Breaking change：否。
-- 风险：若设置 `OPENCLAW_STATE_DIR` 指向非预期目录，需要 `--force`。
+- Breaking change: No.
+- Risk: If `OPENCLAW_STATE_DIR` is set to an unintended directory, `--force` is required.

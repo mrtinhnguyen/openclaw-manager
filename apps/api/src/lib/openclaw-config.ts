@@ -3,8 +3,8 @@ import os from "node:os";
 import path from "node:path";
 import JSON5 from "json5";
 
-const CONFIG_FILENAME = "openclaw.json";
-const STATE_DIRS = [".openclaw"] as const;
+const CONFIG_FILENAME = "blockclaw.json";
+const STATE_DIRS = [".blockclaw-manager"] as const;
 
 export type ConfigSnapshot =
   | { ok: true; path: string; raw: string; config: unknown }
@@ -53,7 +53,7 @@ export function resolveConfigPath(env: NodeJS.ProcessEnv = process.env): string 
       // ignore
     }
   }
-  return candidates[0] ?? path.join(os.homedir(), ".openclaw", CONFIG_FILENAME);
+  return candidates[0] ?? path.join(os.homedir(), ".blockclaw-manager", CONFIG_FILENAME);
 }
 
 export function readConfigSnapshot(env: NodeJS.ProcessEnv = process.env): ConfigSnapshot {

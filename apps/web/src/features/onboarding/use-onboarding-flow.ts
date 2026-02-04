@@ -2,12 +2,14 @@ import { useMemo } from "react";
 
 import { useOnboardingStore } from "@/stores/onboarding-store";
 import { useStatusStore } from "@/stores/status-store";
+import { useCryptoStore } from "@/stores/crypto-store";
 
 import { deriveOnboardingContext } from "./domain/context";
 
 export function useOnboardingFlow() {
   const status = useStatusStore((state) => state.status);
   const loading = useStatusStore((state) => state.loading);
+  const cryptoConfigured = useCryptoStore((state) => state.cryptoConfigured);
 
   const currentStep = useOnboardingStore((store) => store.currentStep);
   const pendingStep = useOnboardingStore((store) => store.pendingStep);
@@ -20,9 +22,10 @@ export function useOnboardingFlow() {
       deriveOnboardingContext({
         status,
         loading,
+        cryptoConfigured,
         events
       }),
-    [status, loading, events]
+    [status, loading, events, cryptoConfigured]
   );
 
   return {

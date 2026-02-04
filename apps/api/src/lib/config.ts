@@ -37,7 +37,7 @@ function findRepoRoot(start: string): string | null {
       try {
         const raw = fs.readFileSync(candidate, "utf-8");
         const parsed = JSON.parse(raw) as { name?: string };
-        if (parsed.name === "clawdbot-manager") return current;
+        if (parsed.name === "blockclaw-manager") return current;
       } catch {
         return current;
       }
