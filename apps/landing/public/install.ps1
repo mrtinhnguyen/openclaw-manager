@@ -1,0 +1,110 @@
+$ErrorActionPreference = "Stop"
+
+$defaultRepoUrl = "https://github.com/mrtinhnguyen/openclaw-manager.git"
+$repoUrl = $env:MANAGER_REPO_URL
+$apiPort = if ($env:MANAGER_API_PORT) { $env:MANAGER_API_PORT } else { "17321" }
+$apiHost = if ($env:MANAGER_API_HOST) { $env:MANAGER_API_HOST } else { "0.0.0.0" }
+
+if (-not $repoUrl) {
+  $repoUrl = $defaultRepoUrl
+  Write-Host "[manager] MANAGER_REPO_URL not set. Using default: $repoUrl"
+}
+
+function Require-Command {
+  param(
+    [Parameter(Mandatory = $true)][string]$Name,
+    [string]$Hint
+  )
+  if (-not (Get-Command $Name -ErrorAction SilentlyContinue)) {
+    if ($Hint) { Write-Error $Hint } else { Write-Error "[manager] $Name is required." }
+    exit 1
+  }
+}
+
+Require-Command -Name "git"
+Require-Command -Name "node" -Hint "[manager] Node.js is required."
+
+if (-not (Get-Command "pnpm" -ErrorAction SilentlyContinue)) {
+  if (Get-Command "corepack" -ErrorAction SilentlyContinue) {
+    corepack enable | Out-Null
+    corepack prepare pnpm@10.23.0 --activate | Out-Null
+  } else {
+    Write-Error "[manager] pnpm is required. Install via: npm i -g pnpm"
+    exit 1
+  }
+}
+
+$installDir = if ($env:MANAGER_INSTALL_DIR) { $env:MANAGER_INSTALL_DIR } else { Join-Path $env:USERPROFILE "blockclaw-manager" }
+$configDir = if ($env:MANAGER_CONFIG_DIR) { $env:MANAGER_CONFIG_DIR } else { Join-Path $env:USERPROFILE ".blockclaw-manager" }
+
+if (Test-Path $installDir) {
+  if (-not (Test-Path (Join-Path $installDir ".git"))) {
+    Write-Error "[manager] Install dir exists and is not a git repo: $installDir. Please choose an empty directory or remove it, then retry."
+    exit 1
+  }
+}
+
+if (Test-Path (Join-Path $installDir ".git")) {
+  Write-Host "[manager] Updating $installDir"
+  git -C $installDir pull --rebase
+} else {
+  Write-Host "[manager] Cloning to $installDir"
+  git clone $repoUrl $installDir
+}
+
+Set-Location $installDir
+
+if (-not $env:MANAGER_ADMIN_USER) {
+  $env:MANAGER_ADMIN_USER = Read-Host "Admin username"
+}
+
+if (-not $env:MANAGER_ADMIN_PASS) {
+  $secure = Read-Host "Admin password" -AsSecureString
+  $ptr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure)
+  try {
+    $env:MANAGER_ADMIN_PASS = [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($ptr)
+  } finally {
+    [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($ptr)
+  }
+}
+
+pnpm install
+pnpm build
+
+New-Item -ItemType Directory -Force -Path $configDir | Out-Null
+
+node apps/api/scripts/create-admin.mjs `
+  --username "$($env:MANAGER_ADMIN_USER)" `
+  --password "$($env:MANAGER_ADMIN_PASS)" `
+  --config (Join-Path $configDir "config.json")
+
+$logPath = if ($env:MANAGER_LOG_PATH) { $env:MANAGER_LOG_PATH } else { Join-Path $env:TEMP "blockclaw-manager.log" }
+$errorLogPath = if ($env:MANAGER_ERROR_LOG_PATH) { $env:MANAGER_ERROR_LOG_PATH } else { Join-Path $env:TEMP "blockclaw-manager.error.log" }
+if ($errorLogPath -eq $logPath) {
+  $errorLogPath = "$logPath.err"
+}
+$webDist = Join-Path $installDir "apps/web/dist"
+$configPath = Join-Path $configDir "config.json"
+$pidPath = Join-Path $configDir "manager.pid"
+
+$env:MANAGER_API_HOST = $apiHost
+$env:MANAGER_API_PORT = $apiPort
+$env:MANAGER_WEB_DIST = $webDist
+$env:MANAGER_CONFIG_PATH = $configPath
+
+$proc = Start-Process -FilePath "node" `
+  -ArgumentList "$installDir\\apps\\api\\dist\\index.js" `
+  -WorkingDirectory $installDir `
+  -WindowStyle Hidden `
+  -RedirectStandardOutput $logPath `
+  -RedirectStandardError $errorLogPath `
+  -PassThru
+
+$proc.Id | Out-File -Encoding ascii $pidPath
+
+Write-Host "[manager] Started in background (log: $logPath)."
+Write-Host "[manager] Error log: $errorLogPath"
+Write-Host "[manager] PID saved to $pidPath."
+Write-Host "[manager] Open (local): http://localhost:$apiPort"
+Write-Host "[manager] Open (local): http://127.0.0.1:$apiPort"
+Write-Host "[manager] Open (LAN): http://<your-server-ip>:$apiPort"
