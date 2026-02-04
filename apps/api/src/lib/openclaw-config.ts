@@ -21,7 +21,7 @@ function resolveUserPath(input: string): string {
 }
 
 function resolveStateDirCandidates(env: NodeJS.ProcessEnv): string[] {
-  const override = env.OPENCLAW_STATE_DIR?.trim();
+  const override = env.BLOCKCLAW_STATE_DIR?.trim() || env.OPENCLAW_STATE_DIR?.trim();
   if (override) {
     return [resolveUserPath(override)];
   }
@@ -29,7 +29,7 @@ function resolveStateDirCandidates(env: NodeJS.ProcessEnv): string[] {
 }
 
 export function resolveConfigCandidates(env: NodeJS.ProcessEnv = process.env): string[] {
-  const explicit = env.OPENCLAW_CONFIG_PATH?.trim();
+  const explicit = env.BLOCKCLAW_CONFIG_PATH?.trim() || env.OPENCLAW_CONFIG_PATH?.trim();
   if (explicit) {
     return [resolveUserPath(explicit)];
   }
